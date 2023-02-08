@@ -1,0 +1,255 @@
+use ndarray::prelude::*;
+use pyo3::prelude::*;
+use std::ops::Add;
+
+#[pyclass]
+#[derive(Debug, Clone, PartialEq)]
+/// Deterministic position vector
+struct DetPos {
+  pos: Array1<f64>,
+}
+
+/// Probabilitstic position vector. It is represented via a Gaussian mixture
+#[pyclass]
+#[derive(Debug, Clone, PartialEq)]
+struct ProbPos {
+  mus: Array2<f64>,
+  covs: Array3<f64>,
+  weights: Vec<f64>,
+}
+
+pub trait Vector {
+  fn get_mean_pos(&self) -> Array1<f64>;
+}
+
+impl Vector for DetPos {
+  fn get_mean_pos(&self) -> Array1<f64> {
+    self.pos.clone()
+  }
+}
+
+/// Generic methods that both DetPos and DetVec must implement
+impl Vector for ProbPos {
+  fn get_mean_pos(&self) -> Array1<f64> {
+    let mut pos: Array1<f64> = self.mus.slice(s![0, ..,]).into_owned();
+    for i in 0..self.mus.nrows() {
+      for j in 0..self.mus.ncols() {
+        pos[j] += self.weights[i] * self.mus[[i, j]];
+      }
+    }
+    pos
+  }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+enum Pos {
+  Det(DetPos),
+  Prob(ProbPos),
+}
+
+#[pyclass]
+struct Module {
+  /// Position vec of module centroid
+  centroid: Pos,
+
+  /// labels for points of inter
+  labels: Vec<i64>,
+
+  /// position of next module
+  p_vector: Pos,
+
+  /// reference frame of next module
+  next_ref_frame: Array3<f64>,
+
+}
+
+impl Add for DetPos {
+  type Output = DetPos;
+  fn add(self, other: DetPos) -> DetPos {
+    DetPos {
+      pos: self.pos + other.pos,
+    }
+  }
+}
+
+/// Allows one to use the '+'  operator on two ProbPos
+impl Add for ProbPos {
+  type Output = Self;
+  fn add(self, other: Self) -> Self {
+    let self_n_comps = self.mus.len_of(Axis(0));
+    let other_n_comps = other.mus.len_of(Axis(0));
+
+    let mut mus = Array::zeros((self_n_comps * other_n_comps, self.mus.ncols()));
+    let mut covs = Array::zeros((mus.nrows(), self.mus.ncols(), self.mus.ncols()));
+    let mut weights = vec![0.0; mus.nrows()];
+
+    for i in 0..self_n_comps {
+      for j in 0..other_n_comps {
+        let idx = i * other.mus.nrows() + j;
+        mus.slice_mut(s![idx, ..]).assign(
+          &(self.mus.slice(s![i, ..]).into_owned() + other.mus.slice(s![j, ..]).into_owned()),
+        );
+        covs.slice_mut(s![idx, .., ..]).assign(
+          &(self.covs.slice(s![i, .., ..]).into_owned()
+            + other.covs.slice(s![j, .., ..]).into_owned()),
+        );
+        weights[idx] = self.weights[i] * other.weights[j];
+      }
+    }
+
+    Self { mus, covs, weights }
+  }
+}
+
+impl ProbPos {
+  fn zero(n_components: usize) -> Self {
+    Self {
+      mus: Array::zeros((n_components, 3)),
+      covs: Array::zeros((n_components, 3, 3)),
+      weights: vec![1.0 / n_components as f64; n_components],
+    }
+  }
+  fn det_add(&self, shift: DetPos) -> ProbPos {
+    let mut mus = self.mus.clone();
+    let covs = self.covs.clone();
+    let weights = self.weights.clone();
+    for j in 0..mus.len_of(Axis(0)) {
+      mus
+        .slice_mut(s![j, ..])
+        .assign(&(self.mus.slice(s![j, ..]).into_owned() + shift.pos.clone().into_owned()));
+    }
+    Self { mus, covs, weights }
+  }
+
+  /// add two probabilitstic vectors together
+  fn prob_add(&self, other: Self) -> Self {
+    self.clone() + other
+  }
+
+  /// add into memory
+  /// TODO inefficient
+  fn add_mut(&mut self, other: &Self) {
+    let c = self.clone() + other.clone();
+    self.mus = c.mus;
+    self.weights = c.weights;
+    self.covs = c.covs;
+  }
+}
+
+impl Add for Pos {
+  type Output = Pos;
+  fn add(self, other: Pos) -> Pos {
+    match (self, other) {
+      (Pos::Det(a), Pos::Det(b)) => Pos::Det(a + b),
+      (Pos::Prob(a), Pos::Prob(b)) => Pos::Prob(a + b),
+      (Pos::Det(a), Pos::Prob(b)) => Pos::Prob(b.det_add(a)),
+      (Pos::Prob(a), Pos::Det(b)) => Pos::Prob(a.det_add(b)),
+    }
+  }
+}
+
+#[pyfunction]
+/// Formats the sum of two numbers as string.
+fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
+  Ok((a + b).to_string())
+}
+
+/// A Python module implemented in Rust.
+#[pymodule]
+fn protein_dynamics(_py: Python, m: &PyModule) -> PyResult<()> {
+  m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
+  Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use approx::abs_diff_eq;
+
+  #[test]
+  fn add_two_det_pos() {
+    let a = DetPos {
+      pos: array![0.4, 20.5, 0.5],
+    };
+
+    let b = DetPos {
+      pos: array![234.8, 0.2, 0.8],
+    };
+
+    let c = a + b;
+
+    assert_eq!(true, abs_diff_eq!(c.pos[[0]], 235.2, epsilon = 0.0000001));
+    assert_eq!(true, abs_diff_eq!(c.pos[[1]], 20.7, epsilon = 0.0000001));
+    assert_eq!(true, abs_diff_eq!(c.pos[[2]], 1.3, epsilon = 0.0000001));
+  }
+
+  #[test]
+  fn add_det_pos_to_prob_pos() {
+    let a = DetPos {
+      pos: array![0.4, 20.5, 0.5],
+    };
+
+    let mut b = ProbPos::zero(2);
+    b.mus[[1, 0]] = 3.8;
+    b.mus[[1, 1]] = 7.8;
+
+    let c = b.det_add(a);
+
+    assert_eq!(true, abs_diff_eq!(c.mus[[0, 0]], 0.4, epsilon = 0.0000001));
+    assert_eq!(
+      true,
+      abs_diff_eq!(c.mus[[1, 0]], 3.8 + 0.4, epsilon = 0.0000001)
+    );
+    assert_eq!(
+      true,
+      abs_diff_eq!(c.mus[[1, 1]], 7.8 + 20.5, epsilon = 0.0000001)
+    );
+  }
+
+  #[test]
+  fn add_prob_pos_to_prob_pos_mus() {
+    let mut a = ProbPos::zero(3);
+    a.mus[[0, 0]] = 3.8;
+    a.mus[[2, 1]] = 7.8;
+
+    let mut b = ProbPos::zero(2);
+    b.mus[[1, 0]] = 234.123;
+    b.mus[[1, 1]] = 7.8;
+
+    let c = a.clone() + b.clone();
+
+    assert_eq!(c.mus.len_of(Axis(0)), 6);
+    assert_eq!(
+      true,
+      abs_diff_eq!(
+        c.mus[[0, 0]],
+        a.mus[[0, 0]] + b.mus[[0, 0]],
+        epsilon = 0.0000001
+      )
+    );
+    assert_eq!(
+      true,
+      abs_diff_eq!(
+        c.mus[[1, 0]],
+        a.mus[[0, 0]] + b.mus[[1, 0]],
+        epsilon = 0.0000001
+      )
+    );
+    assert_eq!(
+      true,
+      abs_diff_eq!(
+        c.mus[[4, 1]],
+        a.mus[[2, 1]] + b.mus[[0, 1]],
+        epsilon = 0.0000001
+      )
+    );
+    assert_eq!(
+      true,
+      abs_diff_eq!(
+        c.mus[[5, 1]],
+        a.mus[[2, 1]] + b.mus[[1, 1]],
+        epsilon = 0.0000001
+      )
+    );
+  }
+}

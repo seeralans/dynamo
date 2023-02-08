@@ -1,2 +1,3 @@
-#+title: protein-dynamics
-#+title: protein-dynamics
+#+title: A Coarse-grained pipeline for dynamics drive protein design.
+
+
