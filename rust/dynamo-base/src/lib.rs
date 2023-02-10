@@ -236,7 +236,12 @@ impl ProbPos {
         .slice_mut(s![j, ..])
         .assign(&(self.mus.slice(s![j, ..]).into_owned() + shift.pos.clone().into_owned()));
     }
-    Self { mus, covs, weights }
+    Self {
+      mus,
+      covs,
+      weights,
+      n_components: self.n_components,
+    }
   }
 
   /// add two probabilitstic vectors together
