@@ -328,6 +328,8 @@ fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
 #[pymodule]
 fn protein_dynamics(_py: Python, m: &PyModule) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
+  m.add_class::<ProbPos>()?;
+  m.add_class::<Module>()?;
   Ok(())
 }
 
