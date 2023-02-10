@@ -58,6 +58,10 @@ impl Vector for DetPos {
   fn get_mean_pos(&self) -> Array1<f64> {
     self.pos.clone()
   }
+
+  fn rotate_mut(&mut self, rot_mat: &Array2<f64>) {
+    self.pos = rot_mat.dot(&self.pos);
+  }
 }
 
 /// Generic methods that both DetPos and DetVec must implement
