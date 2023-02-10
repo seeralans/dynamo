@@ -25,6 +25,11 @@ pub struct ProbPos {
   #[pyo3(get, set)]
   n_components: usize,
 }
+#[derive(Debug, Clone, PartialEq)]
+pub enum Pos {
+  Det(DetPos),
+  Prob(ProbPos),
+}
 #[pyclass]
 #[derive(Debug, Clone, PartialEq)]
 struct Module {
