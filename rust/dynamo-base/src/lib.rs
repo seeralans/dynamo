@@ -132,6 +132,53 @@ impl ProbPos {
     self.clone() + other
   }
 
+#[pymethods]
+impl ProbPos {
+  #[new]
+  fn new( mus: &PyArray2<f64>, covs: &PyArray3<f64>, weights: &PyArray1<f64>) -> Self {
+    Self {
+      mus: mus.readonly().as_array().into_owned(),
+      covs: covs.readonly().as_array().into_owned(),
+      weights: weights
+        .readonly()
+        .readonly()
+        .as_array()
+        .iter()
+        .map(|a| *a as f64)
+        .collect(),
+      n_components: mus.readonly().as_array().nrows(),
+    }
+  }
+
+  #[getter(weights)]
+  fn get_weights(&self, py: Python) -> Py<PyArray1<f64>> {
+    self.weights.clone().into_pyarray(py).to_owned()
+  }
+
+  #[getter(mus)]
+  fn get_mus(&self, py: Python) -> Py<PyArray2<f64>> {
+    self.mus.clone().into_pyarray(py).to_owned()
+  }
+
+
+  #[getter(covs)]
+  fn get_covs(&self, py: Python) -> Py<PyArray3<f64>> {
+    self.covs.clone().into_pyarray(py).to_owned()
+  }
+
+  #[setter(mus)]
+  fn set_mus(&mut self, mus: &PyArray2<f64>)  -> PyResult<()> {
+    self.mus =  mus.readonly().as_array().into_owned();
+    Ok(())
+  }
+
+  #[setter(covs)]
+  fn set_covs(&mut self, covs: &PyArray3<f64>) -> PyResult<()> {
+    self.covs =  covs.readonly().as_array().into_owned();
+    Ok(())
+  }
+
+
   /// add into memory
   /// TODO inefficient
   fn add_mut(&mut self, other: &Self) {
