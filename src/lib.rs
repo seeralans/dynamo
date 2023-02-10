@@ -171,18 +171,59 @@ impl Add for ProbPos {
       }
     }
 
-    Self { mus, covs, weights }
+    Self {
+      mus,
+      covs,
+      weights,
+      n_components,
+    }
+  }
+}
+
+
+impl Add for Pos {
+  type Output = Pos;
+  fn add(self, other: Pos) -> Pos {
+    match (self, other) {
+      (Pos::Det(a), Pos::Det(b)) => Pos::Det(a + b),
+      (Pos::Prob(a), Pos::Prob(b)) => Pos::Prob(a + b),
+      (Pos::Det(a), Pos::Prob(b)) => Pos::Prob(b.det_add(a)),
+      (Pos::Prob(a), Pos::Det(b)) => Pos::Prob(a.det_add(b)),
+    }
+  }
+}
+
+#[pymethods]
+impl DetPos {
+  #[new]
+  fn new(array_pos: &PyArray1<f64>) -> Self {
+    Self {
+      pos: array_pos.readonly().as_array().into_owned(),
+    }
   }
 }
 
 impl ProbPos {
-  fn zero(n_components: usize) -> Self {
+  /// create a new zero vector
+  fn new_zero(n_components: usize) -> Self {
     Self {
       mus: Array::zeros((n_components, 3)),
       covs: Array::zeros((n_components, 3, 3)),
       weights: vec![1.0 / n_components as f64; n_components],
+      n_components,
     }
   }
+
+  fn det_add_mut(&mut self, shift: DetPos) {
+    for n in 0..self.n_components {
+      let mu = self.mus.slice(s![n, ..]).into_owned();
+      self
+        .mus
+        .slice_mut(s![n, ..])
+        .assign(&(mu + shift.pos.clone()));
+    }
+  }
+
   fn det_add(&self, shift: DetPos) -> ProbPos {
     let mut mus = self.mus.clone();
     let covs = self.covs.clone();
