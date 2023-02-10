@@ -5,14 +5,14 @@ use std::ops::Add;
 #[pyclass]
 #[derive(Debug, Clone, PartialEq)]
 /// Deterministic position vector
-struct DetPos {
+pub struct DetPos {
   pos: Array1<f64>,
 }
 
 /// Probabilitstic position vector. It is represented via a Gaussian mixture
 #[pyclass]
 #[derive(Debug, Clone, PartialEq)]
-struct ProbPos {
+pub struct ProbPos {
   mus: Array2<f64>,
   covs: Array3<f64>,
   weights: Vec<f64>,
