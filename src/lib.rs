@@ -83,6 +83,18 @@ impl Vector for ProbPos {
 enum Pos {
   Det(DetPos),
   Prob(ProbPos),
+  fn rotate_mut(&mut self, rot_mat: &Array2<f64>) {
+    // rotate means
+    for n in 0..self.n_components {
+      let mu = self.mus.slice(s![n, ..]).into_owned();
+      self.mus.slice_mut(s![n, ..]).assign(&rot_mat.dot(&mu));
+      let cov = self.covs.slice(s![n, .., ..]).into_owned();
+      self
+        .covs
+        .slice_mut(s![n, .., ..])
+        .assign(&rot_mat.dot(&cov))
+    }
+  }
 }
 
 #[pyclass]
