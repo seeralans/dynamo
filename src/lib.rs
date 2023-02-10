@@ -87,9 +87,21 @@ enum Pos {
 struct Module {
   /// Position vec of module centroid
   centroid: Pos,
+impl Vector for Pos {
+  fn get_mean_pos(&self) -> Array1<f64> {
+    match self {
+      Self::Det(pos) => pos.get_mean_pos(),
+      Self::Prob(pos) => pos.get_mean_pos(),
+    }
+  }
 
-  /// labels for points of inter
-  labels: Vec<i64>,
+  fn rotate_mut(&mut self, rot_mat: &Array2<f64>) {
+    match self {
+      Self::Det(pos) => pos.rotate_mut(rot_mat),
+      Self::Prob(pos) => pos.rotate_mut(rot_mat),
+    }
+  }
+}
 
   /// position of next module
   p_vector: Pos,
