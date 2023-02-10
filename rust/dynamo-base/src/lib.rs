@@ -315,6 +315,8 @@ impl Add for Pos {
       (Pos::Det(a), Pos::Prob(b)) => Pos::Prob(b.det_add(a)),
       (Pos::Prob(a), Pos::Det(b)) => Pos::Prob(a.det_add(b)),
     }
+  fn __iadd__(&mut self, other: &Self) {
+    self.add_mut(other);
   }
 }
 
