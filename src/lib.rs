@@ -105,10 +105,36 @@ impl Vector for Pos {
 
   /// position of next module
   p_vector: Pos,
+#[pymethods]
+impl Module {
+  #[new]
+  fn new(p_vector: ProbPos, next_ref_frame: &PyArray2<f64>) -> Self {
+    Self {
+      centroid: Pos::Det(DetPos{pos: array![0.0, 0.0, 0.0] }),
+      labels: vec![0; 0],
+      p_vector: Pos::Prob(p_vector),
+      next_ref_frame: next_ref_frame.readonly().as_array().into_owned(),
+      tracked_points: vec![Pos::Det(DetPos { pos: array![0.0, 0.0, 0.0] })],
+    }
+  }
 
-  /// reference frame of next module
-  next_ref_frame: Array3<f64>,
+  fn attachement_transform_mut(&mut self, other_module: &Module) {
+    self.next_ref_frame = other_module.next_ref_frame.view().dot(&self.next_ref_frame);
+    self.p_vector.rotate_mut(&other_module.next_ref_frame);
+    self.centroid = other_module.centroid.clone() + other_module.p_vector.clone();
 
+    for pos in self.tracked_points.iter_mut() {
+      *pos = self.centroid.clone() + pos.clone();
+    }
+  }
+
+  #[getter(p_vector)] 
+  fn get_p_vector(&self) -> ProbPos {
+    match &self.p_vector {
+      Pos::Prob(x) => x.clone(),
+      Pos::Det(x) => ProbPos::new_zero(1),
+    }
+  }
 }
 
 impl Add for DetPos {
