@@ -22,6 +22,9 @@ pub struct ProbPos {
   mus: Array2<f64>,
   covs: Array3<f64>,
   weights: Vec<f64>,
+  #[pyo3(get, set)]
+  n_components: usize,
+}
 }
 
 pub trait Vector {
