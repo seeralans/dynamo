@@ -353,7 +353,7 @@ mod tests {
       pos: array![0.4, 20.5, 0.5],
     };
 
-    let mut b = ProbPos::zero(2);
+    let mut b = ProbPos::new_zero(2);
     b.mus[[1, 0]] = 3.8;
     b.mus[[1, 1]] = 7.8;
 
@@ -372,11 +372,11 @@ mod tests {
 
   #[test]
   fn add_prob_pos_to_prob_pos_mus() {
-    let mut a = ProbPos::zero(3);
+    let mut a = ProbPos::new_zero(3);
     a.mus[[0, 0]] = 3.8;
     a.mus[[2, 1]] = 7.8;
 
-    let mut b = ProbPos::zero(2);
+    let mut b = ProbPos::new_zero(2);
     b.mus[[1, 0]] = 234.123;
     b.mus[[1, 1]] = 7.8;
 
