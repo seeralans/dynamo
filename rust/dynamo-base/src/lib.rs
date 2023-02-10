@@ -77,12 +77,7 @@ impl Vector for ProbPos {
     }
     pos
   }
-}
 
-#[derive(Debug, Clone, PartialEq)]
-enum Pos {
-  Det(DetPos),
-  Prob(ProbPos),
   fn rotate_mut(&mut self, rot_mat: &Array2<f64>) {
     // rotate means
     for n in 0..self.n_components {
@@ -97,10 +92,6 @@ enum Pos {
   }
 }
 
-#[pyclass]
-struct Module {
-  /// Position vec of module centroid
-  centroid: Pos,
 impl Vector for Pos {
   fn get_mean_pos(&self) -> Array1<f64> {
     match self {
@@ -117,8 +108,6 @@ impl Vector for Pos {
   }
 }
 
-  /// position of next module
-  p_vector: Pos,
 #[pymethods]
 impl Module {
   #[new]
@@ -261,6 +250,8 @@ impl ProbPos {
     self.clone() + other
   }
 
+}
+
 #[pymethods]
 impl ProbPos {
   #[new]
@@ -316,17 +307,7 @@ impl ProbPos {
     self.weights = c.weights;
     self.covs = c.covs;
   }
-}
 
-impl Add for Pos {
-  type Output = Pos;
-  fn add(self, other: Pos) -> Pos {
-    match (self, other) {
-      (Pos::Det(a), Pos::Det(b)) => Pos::Det(a + b),
-      (Pos::Prob(a), Pos::Prob(b)) => Pos::Prob(a + b),
-      (Pos::Det(a), Pos::Prob(b)) => Pos::Prob(b.det_add(a)),
-      (Pos::Prob(a), Pos::Det(b)) => Pos::Prob(a.det_add(b)),
-    }
   fn __iadd__(&mut self, other: &Self) {
     self.add_mut(other);
   }
@@ -336,6 +317,12 @@ impl Add for Pos {
 /// Formats the sum of two numbers as string.
 fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
   Ok((a + b).to_string())
+}
+
+#[pyfunction]
+/// Formats the sum of two numbers as string.
+fn other(a: &PyArray1<f64>) -> PyResult<String> {
+  Ok((4 + 3).to_string())
 }
 
 /// A Python module implemented in Rust.
