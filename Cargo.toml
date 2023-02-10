@@ -1,0 +1,20 @@
+[package]
+name = "protein-dynamics"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "protein_dynamics"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.18.1", features = ["extension-module"] }
+ndarray = { version = "0.15.6", features = ["rayon"] }
+numpy = "0.18.0"
+approx = "0.5.0"
+num = "0.3.1"
+# ndarray-linalg = "0.16.0"
+
+# ndarray = { version = "0.14.0", features = ["rayon"] }
+# numpy = "0.13.1"
