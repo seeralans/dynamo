@@ -1,0 +1,7 @@
+tab_spaces = 2
+indent_style = "Block"
+imports_indent = "Block"
+fn_single_line = false
+force_multiline_blocks = true
+imports_layout = "HorizontalVertical"
+control_brace_style = "AlwaysSameLine"
