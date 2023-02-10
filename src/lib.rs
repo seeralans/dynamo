@@ -1,6 +1,12 @@
+use ndarray::linalg::Dot;
 use ndarray::prelude::*;
 use pyo3::prelude::*;
 use std::ops::Add;
+
+use numpy::{IntoPyArray, PyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1};
+use pyo3::prelude::*;
+use pyo3::types::PyComplex;
+use pyo3::wrap_pyfunction;
 
 #[pyclass]
 #[derive(Debug, Clone, PartialEq)]
