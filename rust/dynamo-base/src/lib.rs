@@ -25,6 +25,23 @@ pub struct ProbPos {
   #[pyo3(get, set)]
   n_components: usize,
 }
+#[pyclass]
+#[derive(Debug, Clone, PartialEq)]
+struct Module {
+  /// Position vec of module centroid
+  centroid: Pos,
+
+  /// labels for points of inter
+  labels: Vec<i64>,
+
+  /// position of next module
+  p_vector: Pos,
+
+  /// reference frame of next module
+  next_ref_frame: Array2<f64>,
+
+  /// tracked points:
+  tracked_points: Vec<Pos>,
 }
 
 pub trait Vector {
