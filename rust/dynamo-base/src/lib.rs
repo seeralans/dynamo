@@ -154,6 +154,7 @@ impl Add for ProbPos {
   fn add(self, other: Self) -> Self {
     let self_n_comps = self.mus.len_of(Axis(0));
     let other_n_comps = other.mus.len_of(Axis(0));
+    let n_components = self_n_comps * other_n_comps;
 
     let mut mus = Array::zeros((self_n_comps * other_n_comps, self.mus.ncols()));
     let mut covs = Array::zeros((mus.nrows(), self.mus.ncols(), self.mus.ncols()));
