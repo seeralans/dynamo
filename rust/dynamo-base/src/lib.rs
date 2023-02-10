@@ -51,6 +51,7 @@ struct Module {
 
 pub trait Vector {
   fn get_mean_pos(&self) -> Array1<f64>;
+  fn rotate_mut(&mut self, rot_mat: &Array2<f64>);
 }
 
 impl Vector for DetPos {
