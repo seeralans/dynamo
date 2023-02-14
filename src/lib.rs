@@ -249,7 +249,26 @@ impl ProbPos {
   fn prob_add(&self, other: Self) -> Self {
     self.clone() + other
   }
+}
 
+#[pymethods]
+impl DetPos {
+  #[new]
+  fn new(array_pos: &PyArray1<f64>) -> Self {
+    Self {
+      pos: array_pos.readonly().as_array().into_owned(),
+    }
+  }
+
+  #[getter(pos)]
+  fn get_pos(&self, py: Python) -> Py<PyArray1<f64>> {
+    self.pos.clone().into_pyarray(py).to_owned()
+  }
+
+  #[setter(pos)]
+  fn set_pos(&mut self, array_pos: &PyArray1<f64>) {
+    self.pos = array_pos.readonly().as_array().into_owned();
+  }
 }
 
 #[pymethods]
