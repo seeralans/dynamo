@@ -353,6 +353,65 @@ fn protein_dynamics(_py: Python, m: &PyModule) -> PyResult<()> {
   Ok(())
 }
 
+#[pymethods]
+impl Module {
+  #[new]
+  fn new(p_vector: ProbPos, next_ref_frame: &PyArray2<f64>) -> Self {
+    Self {
+      centroid: Pos::Det(DetPos {
+        pos: array![0.0, 0.0, 0.0],
+      }),
+      labels: vec![0; 0],
+      p_vector: Pos::Prob(p_vector),
+      next_ref_frame: next_ref_frame.readonly().as_array().into_owned(),
+      tracked_points: vec![Pos::Det(DetPos {
+        pos: array![0.0, 0.0, 0.0],
+      })],
+    }
+  }
+
+  fn add_prob_point_of_interest(&mut self, point: ProbPos) {
+    self.tracked_points.push(Pos::Prob(point));
+  }
+
+  fn add_det_point_of_interest(&mut self, point: DetPos) {
+    self.tracked_points.push(Pos::Det(point));
+  }
+
+  fn attachement_transform_mut(&mut self, other_module: &Module) {
+    self.next_ref_frame = other_module.next_ref_frame.view().dot(&self.next_ref_frame);
+    self.p_vector.rotate_mut(&other_module.next_ref_frame);
+    self.p_vector = self.p_vector.clone() + other_module.p_vector.clone();
+    self.centroid = other_module.centroid.clone() + other_module.p_vector.clone();
+
+    for pos in self.tracked_points.iter_mut() {
+      *pos = self.centroid.clone() + pos.clone();
+    }
+  }
+
+  #[getter(p_vector)]
+  fn get_p_vector(&self) -> ProbPos {
+    match &self.p_vector {
+      Pos::Prob(x) => x.clone(),
+      Pos::Det(x) => ProbPos::new_zero(1),
+    }
+  }
+
+  #[setter(p_vector)]
+  fn set_p_vector(&mut self, p_vector: ProbPos) {
+    self.p_vector = Pos::Prob(p_vector);
+  }
+
+  // TODO: getter for DetPos
+  #[getter(centroid)]
+  fn get_centroid(&self) -> ProbPos {
+    match &self.centroid {
+      Pos::Prob(x) => x.clone(),
+      Pos::Det(x) => ProbPos::new_zero(1),
+    }
+  }
+
+}
 #[cfg(test)]
 mod tests {
   use super::*;
