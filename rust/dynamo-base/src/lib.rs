@@ -152,7 +152,6 @@ impl Add for ProbPos {
   }
 }
 
-
 impl Add for Pos {
   type Output = Pos;
   fn add(self, other: Pos) -> Pos {
@@ -369,6 +368,7 @@ impl Module {
   }
 
 }
+
 #[cfg(test)]
 mod tests {
   use super::*;
