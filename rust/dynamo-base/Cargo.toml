@@ -18,3 +18,10 @@ num = "0.3.1"
 
 # ndarray = { version = "0.14.0", features = ["rayon"] }
 # numpy = "0.13.1"
+
+
+[profile.dev]
+opt-level = 3
+
+[profile.release]
+opt-level = 3
