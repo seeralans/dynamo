@@ -257,24 +257,22 @@ impl ProbPos {
     self.mus.clone().into_pyarray(py).to_owned()
   }
 
-
   #[getter(covs)]
   fn get_covs(&self, py: Python) -> Py<PyArray3<f64>> {
     self.covs.clone().into_pyarray(py).to_owned()
   }
 
   #[setter(mus)]
-  fn set_mus(&mut self, mus: &PyArray2<f64>)  -> PyResult<()> {
-    self.mus =  mus.readonly().as_array().into_owned();
+  fn set_mus(&mut self, mus: &PyArray2<f64>) -> PyResult<()> {
+    self.mus = mus.readonly().as_array().into_owned();
     Ok(())
   }
 
   #[setter(covs)]
   fn set_covs(&mut self, covs: &PyArray3<f64>) -> PyResult<()> {
-    self.covs =  covs.readonly().as_array().into_owned();
+    self.covs = covs.readonly().as_array().into_owned();
     Ok(())
   }
-
 
   /// add into memory
   /// TODO inefficient
