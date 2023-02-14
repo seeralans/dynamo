@@ -165,16 +165,6 @@ impl Add for Pos {
   }
 }
 
-#[pymethods]
-impl DetPos {
-  #[new]
-  fn new(array_pos: &PyArray1<f64>) -> Self {
-    Self {
-      pos: array_pos.readonly().as_array().into_owned(),
-    }
-  }
-}
-
 impl ProbPos {
   /// create a new zero vector
   fn new_zero(n_components: usize) -> Self {
