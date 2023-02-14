@@ -255,7 +255,7 @@ impl ProbPos {
 #[pymethods]
 impl ProbPos {
   #[new]
-  fn new( mus: &PyArray2<f64>, covs: &PyArray3<f64>, weights: &PyArray1<f64>) -> Self {
+  fn new(mus: &PyArray2<f64>, covs: &PyArray3<f64>, weights: &PyArray1<f64>) -> Self {
     Self {
       mus: mus.readonly().as_array().into_owned(),
       covs: covs.readonly().as_array().into_owned(),
