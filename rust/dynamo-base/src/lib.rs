@@ -48,8 +48,19 @@ struct Module {
   next_ref_frame: Array2<f64>,
 
   /// tracked points:
-  tracked_points: Vec<Pos>,
+  tracked_points: Vec<ProbPos>,
 }
+
+#[pyclass]
+#[derive(Debug, Clone, PartialEq)]
+struct Tree {
+  nodes: Vec<Module>,
+  edges: Vec<(usize, usize)>,
+}
+
+
+
+
 
 pub trait Vector {
   fn get_mean_pos(&self) -> Array1<f64>;
@@ -114,6 +125,14 @@ impl Add for DetPos {
     DetPos {
       pos: self.pos + other.pos,
     }
+  }
+}
+
+impl From<DetPos>  for ProbPos{
+  fn from(det_pos: DetPos) -> Self {
+    let mut pos = Self::new_zero(0);
+    pos.mus.slice_mut(s![0, ..]).assign(&det_pos.pos);
+    pos
   }
 }
 
@@ -320,30 +339,34 @@ impl Module {
       labels: vec![0; 0],
       p_vector: Pos::Prob(p_vector),
       next_ref_frame: next_ref_frame.readonly().as_array().into_owned(),
-      tracked_points: vec![Pos::Det(DetPos {
-        pos: array![0.0, 0.0, 0.0],
-      })],
+      tracked_points: vec![ProbPos::new_zero(1); 0],
     }
   }
 
   fn add_prob_point_of_interest(&mut self, point: ProbPos) {
-    self.tracked_points.push(Pos::Prob(point));
+    self.tracked_points.push(point);
   }
 
   fn add_det_point_of_interest(&mut self, point: DetPos) {
-    self.tracked_points.push(Pos::Det(point));
+    self.tracked_points.push(point.into());
   }
 
-  fn attachement_transform_mut(&mut self, other_module: &Module) {
+  fn attachment_transform_mut(&mut self, other_module: &Module) {
     self.next_ref_frame = other_module.next_ref_frame.view().dot(&self.next_ref_frame);
     self.p_vector.rotate_mut(&other_module.next_ref_frame);
-    self.p_vector = self.p_vector.clone() + other_module.p_vector.clone();
+    // self.p_vector = self.p_vector.clone() + other_module.p_vector.clone();
     self.centroid = other_module.centroid.clone() + other_module.p_vector.clone();
 
     for pos in self.tracked_points.iter_mut() {
-      *pos = self.centroid.clone() + pos.clone();
+      let mut pos_c = pos.clone();
+      pos_c.rotate_mut(&other_module.next_ref_frame);
+      match &self.centroid {
+        Pos::Prob(cent) => *pos = cent.clone() + pos_c,
+        Pos::Det(cent) => *pos = ProbPos::from(cent.clone()) + pos_c,
+      }
     }
   }
+
 
   #[getter(p_vector)]
   fn get_p_vector(&self) -> ProbPos {
@@ -351,6 +374,11 @@ impl Module {
       Pos::Prob(x) => x.clone(),
       Pos::Det(x) => ProbPos::new_zero(1),
     }
+  }
+
+  #[getter(next_ref_frame)]
+  fn get_next_ref_frame(&self, py: Python) -> Py<PyArray2<f64>> {
+    self.next_ref_frame.clone().into_pyarray(py).to_owned()
   }
 
   #[setter(p_vector)]
@@ -367,6 +395,16 @@ impl Module {
     }
   }
 
+  // TODO: getter for DetPos
+  #[setter(centroid)]
+  fn set_centroid(&mut self, centroid: ProbPos) {
+    self.centroid = Pos::Prob(centroid);
+  }
+
+  #[getter(tracked_points)]
+  fn get_tracked_points(&self) -> Vec<ProbPos> {
+    self.tracked_points.clone()
+  }
 }
 
 #[cfg(test)]
