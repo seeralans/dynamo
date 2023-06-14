@@ -570,6 +570,16 @@ impl Construct {
     adjacency_matrix
   }
 
+  // TODO: It may be possible to remove the edges without re-initiallizing the tree
+  fn clear_tree(&mut self) {
+    self.tree = Arena::new();
+    self.node_ids = Vec::<NodeId>::new();
+    for i in 0..self.raw_modules.len() {
+      let node = self.tree.new_node(i);
+      self.node_ids.push(node);
+    }
+  }
+
 #[cfg(test)]
 mod tests {
   use super::*;
