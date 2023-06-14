@@ -695,6 +695,11 @@ impl Construct {
     }
   }
 
+  fn get_assembled_modules(&self) -> Vec<GeneralModule> {
+    self.assembled_modules.clone()
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
