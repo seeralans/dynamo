@@ -486,6 +486,19 @@ impl GeneralModule {
     }
   }
 
+  fn get_p_vector(&self, idx: usize) -> ProbPos {
+    match &self.p_vectors[idx] {
+      Pos::Prob(x) => x.clone(),
+      Pos::Det(x) => ProbPos::new_zero(1),
+    }
+  }
+
+  fn get_next_ref_frame(&self, py: Python, idx: usize) -> Py<PyArray2<f64>> {
+    self.next_ref_frames[idx]
+      .clone()
+      .into_pyarray(py)
+      .to_owned()
+  }
 #[cfg(test)]
 mod tests {
   use super::*;
