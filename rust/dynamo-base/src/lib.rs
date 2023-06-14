@@ -570,6 +570,32 @@ impl Construct {
     adjacency_matrix
   }
 
+  fn build_tree_inner(
+    stack: &mut Vec<usize>,
+    node_ids: &mut Vec<NodeId>,
+    adj: &mut Array2<i64>,
+    tree: &mut Arena<usize>,
+  ) {
+    if let Some(c_node) = stack.pop() {
+      if adj.slice(s![c_node, ..]).sum() == 0 {
+        return;
+      }
+
+      for i in 0..node_ids.len() {
+        if adj[[c_node, i]] == 1 {
+          node_ids[c_node].append(node_ids[i], tree);
+          adj[[i, c_node]] = 0;
+          stack.push(i);
+        } else {
+        }
+      }
+
+      Construct::build_tree_inner(stack, node_ids, adj, tree);
+    } else {
+      return;
+    }
+  }
+
   // TODO: It may be possible to remove the edges without re-initiallizing the tree
   fn clear_tree(&mut self) {
     self.tree = Arena::new();
