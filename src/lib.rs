@@ -410,6 +410,20 @@ struct GeneralModule {
   align_p_idx: usize,
 }
 
+impl GeneralModule {
+  fn new(p_vectors: Vec<ProbPos>, next_ref_frames: Vec<Array2<f64>>) -> Self {
+    Self {
+      centroid: Pos::Det(DetPos {
+        pos: array![0.0, 0.0, 0.0],
+      }),
+      labels: vec![0; 0],
+      p_vectors: p_vectors.iter().map(|x| Pos::Prob(x.clone())).collect(),
+      next_ref_frames: next_ref_frames,
+      tracked_points: vec![ProbPos::new_zero(1); 0],
+      align_p_idx: 0,
+    }
+  }
+
 #[cfg(test)]
 mod tests {
   use super::*;
