@@ -665,6 +665,36 @@ impl Construct {
   fn add_edges(&mut self, edge: ((usize, usize), (usize, usize))) {
     self.edges.push(edge);
   }
+  /// Propagate the dynamics from the starting node
+  fn propagate(&mut self, starting_node: usize) {
+    self.build_tree(starting_node);
+    self.assembled_modules = self.raw_modules.clone();
+
+    let mut tree_iter = self.node_ids[starting_node].descendants(&self.tree);
+
+    // skip the root
+    tree_iter.next();
+
+    for node_id in tree_iter {
+      let (parent_id, current_id) = match self.tree[node_id].parent() {
+        Some(parent_id) => (*self.tree[parent_id].get(), *self.tree[node_id].get()),
+        None => {
+          panic!("Current node has no parent!");
+          (0, *self.tree[node_id].get())
+        }
+      };
+
+      let (parent_p_id, current_p_id) =
+        self.get_attachment_idxs_from_edge_list(parent_id, current_id);
+
+      let mut current_module = self.assembled_modules[current_id].clone();
+      current_module.attachment_transform_mut(current_p_id, parent_p_id,
+                                              &self.assembled_modules[parent_id]);
+
+      self.assembled_modules[current_id] = current_module; 
+    }
+  }
+
 #[cfg(test)]
 mod tests {
   use super::*;
