@@ -442,6 +442,24 @@ impl GeneralModule {
     }
   }
 }
+#[pymethods]
+impl GeneralModule {
+  #[new]
+  fn new_py(p_vectors: Vec<ProbPos>, next_ref_frames: Vec<&PyArray2<f64>>) -> Self {
+    Self {
+      centroid: Pos::Det(DetPos {
+        pos: array![0.0, 0.0, 0.0],
+      }),
+      labels: vec![0; 0],
+      p_vectors: p_vectors.iter().map(|x| Pos::Prob(x.clone())).collect(),
+      next_ref_frames: next_ref_frames
+        .iter()
+        .map(|x| x.readonly().as_array().into_owned())
+        .collect(),
+      tracked_points: vec![ProbPos::new_zero(1); 0],
+      align_p_idx: 0,
+    }
+  }
 #[cfg(test)]
 mod tests {
   use super::*;
