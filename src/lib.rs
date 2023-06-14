@@ -424,6 +424,13 @@ impl GeneralModule {
     }
   }
 
+  fn realign_module(&mut self, new_p_idx: usize) {
+    if new_p_idx == self.align_p_idx {
+      return;
+    }
+    // TODO fill this in!
+    panic!("realign_module not implemented!");
+  }
 #[cfg(test)]
 mod tests {
   use super::*;
