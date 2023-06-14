@@ -555,6 +555,21 @@ pub struct Construct {
   // Adjacency matrix constructed internally using given edges
   adjacency_matrix: Array2<i64>,
 }
+impl Construct {
+  fn edges_to_adjacency_matrix(
+    num_nodes: usize,
+    edges: &Vec<((usize, usize), (usize, usize))>,
+  ) -> Array2<i64> {
+    let mut adjacency_matrix = Array2::zeros((num_nodes, num_nodes));
+    // Use edge list to fill adjacency matrix
+    for edge in edges.iter() {
+      adjacency_matrix[[edge.0 .0, edge.1 .0]] = 1;
+      adjacency_matrix[[edge.1 .0, edge.0 .0]] = 1;
+    }
+
+    adjacency_matrix
+  }
+
 #[cfg(test)]
 mod tests {
   use super::*;
