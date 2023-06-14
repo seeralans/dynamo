@@ -302,28 +302,6 @@ impl ProbPos {
   }
 }
 
-#[pyfunction]
-/// Formats the sum of two numbers as string.
-fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
-  Ok((a + b).to_string())
-}
-
-#[pyfunction]
-/// Formats the sum of two numbers as string.
-fn other(a: &PyArray1<f64>) -> PyResult<String> {
-  Ok((4 + 3).to_string())
-}
-
-/// A Python module implemented in Rust.
-#[pymodule]
-fn protein_dynamics(_py: Python, m: &PyModule) -> PyResult<()> {
-  m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
-  m.add_class::<ProbPos>()?;
-  m.add_class::<DetPos>()?;
-  m.add_class::<Module>()?;
-  Ok(())
-}
-
 #[pymethods]
 impl Module {
   #[new]
