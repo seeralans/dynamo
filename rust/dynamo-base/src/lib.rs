@@ -580,6 +580,23 @@ impl Construct {
     }
   }
 
+  /// Searches the edge list to get the module attachment p idxs
+  fn get_attachment_idxs_from_edge_list(
+    &self,
+    parent_id: usize,
+    current_id: usize,
+  ) -> (usize, usize) {
+    for edge in self.edges.iter() {
+      if edge.0 .0 == parent_id && edge.1 .0 == current_id {
+        return (edge.0 .1, edge.1 .1);
+      } else if edge.1 .0 == parent_id && edge.0 .0 == current_id {
+        return (edge.1 .1, edge.0 .1);
+      }
+    }
+    panic!("parent and current do not have an edge!");
+    (0, 0)
+  }
+}
 #[cfg(test)]
 mod tests {
   use super::*;
