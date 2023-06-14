@@ -859,4 +859,43 @@ mod tests {
     assert_eq!(adj, Construct::edges_to_adjacency_matrix(5, &edges));
   }
 
+  #[test]
+  fn build_tree() {
+    let edges = vec![
+      ((0, 0), (1, 0)),
+      ((1, 1), (2, 0)),
+      ((1, 2), (3, 0)),
+      ((3, 1), (4, 0)),
+    ];
+
+    let adj: Array2<i64> = array![
+      [0, 1, 0, 0, 0],
+      [1, 0, 1, 1, 0],
+      [0, 1, 0, 0, 0],
+      [0, 1, 0, 0, 1],
+      [0, 0, 0, 1, 0],
+    ];
+
+    let mut tree = Arena::<usize>::new();
+    let mut nodes: Vec<NodeId> = vec![];
+    for i in 0..5 {
+      let node = tree.new_node(i);
+      nodes.push(node);
+    }
+
+    nodes[1].append(nodes[0], &mut tree);
+    nodes[1].append(nodes[2], &mut tree);
+    nodes[3].append(nodes[1], &mut tree);
+    nodes[4].append(nodes[3], &mut tree);
+
+    let prob_poses = vec![ProbPos::new_zero(3)];
+    let next_ref_frames = vec![Array::eye(3)];
+    let module = GeneralModule::new(prob_poses.clone(), next_ref_frames.clone());
+    let modules = vec![module.clone(); 5];
+
+    let mut construct = Construct::new(modules, edges.clone());
+    construct.build_tree(1);
+    construct.build_tree(4);
+    assert_eq!(tree, construct.tree.clone());
+  }
 }
