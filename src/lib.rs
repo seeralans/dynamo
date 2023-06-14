@@ -839,4 +839,24 @@ mod tests {
     assert_eq!(a.covs.slice(s![0, .., ..]), cov_r);
   }
 
+  #[test]
+  fn build_adjacency_matrix_from_edges() {
+    let edges = vec![
+      ((0, 0), (1, 0)),
+      ((1, 1), (2, 0)),
+      ((1, 2), (3, 0)),
+      ((3, 1), (4, 0)),
+    ];
+
+    let adj: Array2<i64> = array![
+      [0, 1, 0, 0, 0],
+      [1, 0, 1, 1, 0],
+      [0, 1, 0, 0, 0],
+      [0, 1, 0, 0, 1],
+      [0, 0, 0, 1, 0],
+    ];
+
+    assert_eq!(adj, Construct::edges_to_adjacency_matrix(5, &edges));
+  }
+
 }
