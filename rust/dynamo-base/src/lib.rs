@@ -522,6 +522,18 @@ impl GeneralModule {
   fn set_centroid(&mut self, centroid: ProbPos) {
     self.centroid = Pos::Prob(centroid);
   }
+
+  #[getter(tracked_points)]
+  fn get_tracked_points(&self) -> Vec<ProbPos> {
+    self.tracked_points.clone()
+  }
+
+  #[setter(tracked_points)]
+  fn set_tracked_points(&mut self, tracked_points: Vec<ProbPos>) {
+    self.tracked_points = tracked_points;
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
