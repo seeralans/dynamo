@@ -720,7 +720,8 @@ fn protein_dynamics(_py: Python, m: &PyModule) -> PyResult<()> {
 mod tests {
   use super::*;
   use approx::abs_diff_eq;
-
+  use ndarray::linalg::Dot;
+  use ndarray::prelude::*;
   #[test]
   fn add_two_det_pos() {
     let a = DetPos {
@@ -807,4 +808,35 @@ mod tests {
       )
     );
   }
+
+  #[test]
+  fn rotate_prob_pos() {
+    let cov = array![[1.0, 2.0, 3.0], [2.0, 2.4, 0.8], [3.0, 0.8, 1.3],];
+
+    let mu = array![3.8, 2.7, 9.2];
+
+    let mut a = ProbPos::new_zero(1);
+    a.mus[[0, 0]] = 3.8;
+    a.mus[[0, 1]] = 2.7;
+    a.mus[[0, 2]] = 9.2;
+
+    for i in 0..3 {
+      a.mus[[0, i]] = mu[[i]];
+      for j in 0..3 {
+        a.covs[[0, i, j]] = cov[[i, j]];
+      }
+    }
+
+    let rot_mat = array![[0.5, 0., 0.866], [0.866, 0., -0.5], [-0., 1., 0.]];
+
+    let mu_r = (&rot_mat.dot(&mu));
+    let cov_r = (&cov.dot(&rot_mat.t())).to_owned();
+    let cov_r = (&rot_mat.dot(&cov_r));
+
+    a.rotate_mut(&rot_mat);
+
+    assert_eq!(a.mus.slice(s![0, ..]), mu_r);
+    assert_eq!(a.covs.slice(s![0, .., ..]), cov_r);
+  }
+
 }
