@@ -656,6 +656,15 @@ impl Construct {
     );
   }
 
+  /// Add a module to the construct.
+  fn add_module(&mut self, module: GeneralModule) {
+    self.raw_modules.push(module);
+  }
+
+  /// Add an edge to the construct.
+  fn add_edges(&mut self, edge: ((usize, usize), (usize, usize))) {
+    self.edges.push(edge);
+  }
 #[cfg(test)]
 mod tests {
   use super::*;
