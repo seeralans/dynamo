@@ -618,6 +618,18 @@ impl Construct {
       adjacency_matrix,
     }
   }
+  /// Builds a tree for the construct with starting_node as the root.
+  fn build_tree(&mut self, starting_node: usize) {
+    self.clear_tree();
+    let mut stack = vec![starting_node];
+    Construct::build_tree_inner(
+      &mut stack,
+      &mut self.node_ids,
+      &mut self.adjacency_matrix.clone(),
+      &mut self.tree,
+    );
+  }
+
 #[cfg(test)]
 mod tests {
   use super::*;
