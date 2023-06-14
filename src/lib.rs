@@ -1,3 +1,5 @@
+use indextree::Arena;
+use indextree::NodeId;
 use ndarray::linalg::Dot;
 use ndarray::prelude::*;
 use pyo3::prelude::*;
