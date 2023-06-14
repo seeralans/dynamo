@@ -597,6 +597,27 @@ impl Construct {
     (0, 0)
   }
 }
+#[pymethods]
+impl Construct {
+  #[new]
+  fn new(raw_modules: Vec<GeneralModule>, edges: Vec<((usize, usize), (usize, usize))>) -> Self {
+    let adjacency_matrix = Construct::edges_to_adjacency_matrix(raw_modules.len(), &edges);
+    let mut tree = Arena::new();
+    let mut node_ids = Vec::<NodeId>::new();
+    for i in 0..raw_modules.len() {
+      let node = tree.new_node(i);
+      node_ids.push(node);
+    }
+
+    Self {
+      raw_modules,
+      edges,
+      tree,
+      node_ids,
+      assembled_modules: Vec::<GeneralModule>::new(),
+      adjacency_matrix,
+    }
+  }
 #[cfg(test)]
 mod tests {
   use super::*;
