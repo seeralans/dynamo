@@ -508,6 +508,20 @@ impl GeneralModule {
     self.p_vectors[idx] = Pos::Prob(p_vector);
   }
 
+  // TODO: getter for DetPos
+  #[getter(centroid)]
+  fn get_centroid(&self) -> ProbPos {
+    match &self.centroid {
+      Pos::Prob(x) => x.clone(),
+      Pos::Det(x) => ProbPos::new_zero(1),
+    }
+  }
+
+  // TODO: getter for DetPos
+  #[setter(centroid)]
+  fn set_centroid(&mut self, centroid: ProbPos) {
+    self.centroid = Pos::Prob(centroid);
+  }
 #[cfg(test)]
 mod tests {
   use super::*;
