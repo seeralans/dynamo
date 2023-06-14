@@ -623,6 +623,7 @@ impl Construct {
     (0, 0)
   }
 }
+
 #[pymethods]
 impl Construct {
   #[new]
@@ -644,6 +645,7 @@ impl Construct {
       adjacency_matrix,
     }
   }
+
   /// Builds a tree for the construct with starting_node as the root.
   fn build_tree(&mut self, starting_node: usize) {
     self.clear_tree();
@@ -665,6 +667,7 @@ impl Construct {
   fn add_edges(&mut self, edge: ((usize, usize), (usize, usize))) {
     self.edges.push(edge);
   }
+
   /// Propagate the dynamics from the starting node
   fn propagate(&mut self, starting_node: usize) {
     self.build_tree(starting_node);
