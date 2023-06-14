@@ -53,6 +53,52 @@ struct Module {
   tracked_points: Vec<ProbPos>,
 }
 
+#[pyclass]
+#[derive(Debug, Clone, PartialEq)]
+struct GeneralModule {
+  /// Assumes that the first of the p_vectors is aligned on the x axis
+
+  /// Position vec of module centroid
+  centroid: Pos,
+
+  /// labels for points of inter
+  labels: Vec<i64>,
+
+  /// position of next module
+  p_vectors: Vec<Pos>,
+
+  /// a vector of reference frame of next modules
+  next_ref_frames: Vec<Array2<f64>>,
+
+  /// tracked points:
+  tracked_points: Vec<ProbPos>,
+
+  /// the idx of the p_vector to which the module is aligned
+  align_p_idx: usize,
+}
+
+#[pyclass]
+#[derive(Debug, Clone, PartialEq)]
+pub struct Construct {
+  // Raw modules that are used in the construct.
+  raw_modules: Vec<GeneralModule>,
+
+  // Edges are stored as a tuple of ((node, connection_point), (node, connection_point))
+  edges: Vec<((usize, usize), (usize, usize))>,
+
+  // Modules assembled in the given order and dynamics propagated.
+  assembled_modules: Vec<GeneralModule>,
+
+  // node_ids
+  node_ids: Vec<NodeId>,
+
+  // Tree constructed using the given edges.
+  tree: Arena<usize>,
+
+  // Adjacency matrix constructed internally using given edges
+  adjacency_matrix: Array2<i64>,
+}
+
 pub trait Vector {
   fn get_mean_pos(&self) -> Array1<f64>;
   fn rotate_mut(&mut self, rot_mat: &Array2<f64>);
@@ -385,30 +431,6 @@ impl Module {
   }
 }
 
-#[pyclass]
-#[derive(Debug, Clone, PartialEq)]
-struct GeneralModule {
-  /// Assumes that the first of the p_vectors is aligned on the x axis
-
-  /// Position vec of module centroid
-  centroid: Pos,
-
-  /// labels for points of inter
-  labels: Vec<i64>,
-
-  /// position of next module
-  p_vectors: Vec<Pos>,
-
-  /// a vector of reference frame of next modules
-  next_ref_frames: Vec<Array2<f64>>,
-
-  /// tracked points:
-  tracked_points: Vec<ProbPos>,
-
-  /// the idx of the p_vector to which the module is aligned
-  align_p_idx: usize,
-}
-
 impl GeneralModule {
   fn new(p_vectors: Vec<ProbPos>, next_ref_frames: Vec<Array2<f64>>) -> Self {
     Self {
@@ -533,28 +555,6 @@ impl GeneralModule {
   fn set_tracked_points(&mut self, tracked_points: Vec<ProbPos>) {
     self.tracked_points = tracked_points;
   }
-}
-
-#[pyclass]
-#[derive(Debug, Clone, PartialEq)]
-pub struct Construct {
-  // Raw modules that are used in the construct.
-  raw_modules: Vec<GeneralModule>,
-
-  // Edges are stored as a tuple of ((node, connection_point), (node, connection_point))
-  edges: Vec<((usize, usize), (usize, usize))>,
-
-  // Modules assembled in the given order and dynamics propagated.
-  assembled_modules: Vec<GeneralModule>,
-
-  // node_ids
-  node_ids: Vec<NodeId>,
-
-  // Tree constructed using the given edges.
-  tree: Arena<usize>,
-
-  // Adjacency matrix constructed internally using given edges
-  adjacency_matrix: Array2<i64>,
 }
 
 impl Construct {
@@ -693,10 +693,13 @@ impl Construct {
         self.get_attachment_idxs_from_edge_list(parent_id, current_id);
 
       let mut current_module = self.assembled_modules[current_id].clone();
-      current_module.attachment_transform_mut(current_p_id, parent_p_id,
-                                              &self.assembled_modules[parent_id]);
+      current_module.attachment_transform_mut(
+        current_p_id,
+        parent_p_id,
+        &self.assembled_modules[parent_id],
+      );
 
-      self.assembled_modules[current_id] = current_module; 
+      self.assembled_modules[current_id] = current_module;
     }
   }
 
