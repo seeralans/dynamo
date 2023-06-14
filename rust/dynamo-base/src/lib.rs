@@ -386,6 +386,30 @@ impl Module {
   }
 }
 
+#[pyclass]
+#[derive(Debug, Clone, PartialEq)]
+struct GeneralModule {
+  /// Assumes that the first of the p_vectors is aligned on the x axis
+
+  /// Position vec of module centroid
+  centroid: Pos,
+
+  /// labels for points of inter
+  labels: Vec<i64>,
+
+  /// position of next module
+  p_vectors: Vec<Pos>,
+
+  /// a vector of reference frame of next modules
+  next_ref_frames: Vec<Array2<f64>>,
+
+  /// tracked points:
+  tracked_points: Vec<ProbPos>,
+
+  /// the idx of the p_vector to which the module is aligned
+  align_p_idx: usize,
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
