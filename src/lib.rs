@@ -713,6 +713,7 @@ fn protein_dynamics(_py: Python, m: &PyModule) -> PyResult<()> {
   m.add_class::<GeneralModule>()?;
   Ok(())
 }
+
 #[cfg(test)]
 mod tests {
   use super::*;
