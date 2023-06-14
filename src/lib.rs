@@ -341,7 +341,6 @@ impl Module {
     }
   }
 
-
   #[getter(p_vector)]
   fn get_p_vector(&self) -> ProbPos {
     match &self.p_vector {
@@ -431,6 +430,7 @@ impl GeneralModule {
     // TODO fill this in!
     panic!("realign_module not implemented!");
   }
+
   fn from_module(module: Module) -> Self {
     Self {
       centroid: module.centroid.clone(),
@@ -442,6 +442,7 @@ impl GeneralModule {
     }
   }
 }
+
 #[pymethods]
 impl GeneralModule {
   #[new]
@@ -555,6 +556,7 @@ pub struct Construct {
   // Adjacency matrix constructed internally using given edges
   adjacency_matrix: Array2<i64>,
 }
+
 impl Construct {
   fn edges_to_adjacency_matrix(
     num_nodes: usize,
