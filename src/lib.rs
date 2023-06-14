@@ -431,6 +431,17 @@ impl GeneralModule {
     // TODO fill this in!
     panic!("realign_module not implemented!");
   }
+  fn from_module(module: Module) -> Self {
+    Self {
+      centroid: module.centroid.clone(),
+      p_vectors: vec![module.p_vector.clone()],
+      next_ref_frames: vec![module.next_ref_frame.clone()],
+      tracked_points: module.tracked_points.clone(),
+      align_p_idx: 0,
+      labels: module.labels.clone(),
+    }
+  }
+}
 #[cfg(test)]
 mod tests {
   use super::*;
