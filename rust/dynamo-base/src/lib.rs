@@ -700,6 +700,16 @@ impl Construct {
   }
 }
 
+/// A Python module implemented in Rust.
+#[pymodule]
+fn protein_dynamics(_py: Python, m: &PyModule) -> PyResult<()> {
+  m.add_class::<ProbPos>()?;
+  m.add_class::<Construct>()?;
+  m.add_class::<DetPos>()?;
+  m.add_class::<Module>()?;
+  m.add_class::<GeneralModule>()?;
+  Ok(())
+}
 #[cfg(test)]
 mod tests {
   use super::*;
