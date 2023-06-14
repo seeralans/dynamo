@@ -355,6 +355,11 @@ impl Module {
     self.next_ref_frame.clone().into_pyarray(py).to_owned()
   }
 
+  #[setter(next_ref_frame)]
+  fn set_next_ref_frame(&mut self, next_ref_frame: &PyArray2<f64>) {
+    self.next_ref_frame = next_ref_frame.readonly().as_array().into_owned();
+  }
+
   #[setter(p_vector)]
   fn set_p_vector(&mut self, p_vector: ProbPos) {
     self.p_vector = Pos::Prob(p_vector);
