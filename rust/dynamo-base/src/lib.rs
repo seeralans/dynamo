@@ -499,6 +499,15 @@ impl GeneralModule {
       .into_pyarray(py)
       .to_owned()
   }
+
+  fn set_next_ref_frame(&mut self, next_ref_frame: &PyArray2<f64>, idx: usize) {
+    self.next_ref_frames[idx] = next_ref_frame.readonly().as_array().into_owned();
+  }
+
+  fn set_p_vector(&mut self, p_vector: ProbPos, idx: usize) {
+    self.p_vectors[idx] = Pos::Prob(p_vector);
+  }
+
 #[cfg(test)]
 mod tests {
   use super::*;
