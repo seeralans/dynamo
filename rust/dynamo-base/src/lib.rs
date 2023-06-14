@@ -534,6 +534,27 @@ impl GeneralModule {
   }
 }
 
+#[pyclass]
+#[derive(Debug, Clone, PartialEq)]
+pub struct Construct {
+  // Raw modules that are used in the construct.
+  raw_modules: Vec<GeneralModule>,
+
+  // Edges are stored as a tuple of ((node, connection_point), (node, connection_point))
+  edges: Vec<((usize, usize), (usize, usize))>,
+
+  // Modules assembled in the given order and dynamics propagated.
+  assembled_modules: Vec<GeneralModule>,
+
+  // node_ids
+  node_ids: Vec<NodeId>,
+
+  // Tree constructed using the given edges.
+  tree: Arena<usize>,
+
+  // Adjacency matrix constructed internally using given edges
+  adjacency_matrix: Array2<i64>,
+}
 #[cfg(test)]
 mod tests {
   use super::*;
