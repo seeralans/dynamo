@@ -714,16 +714,51 @@ impl Construct {
     self.edges.push(edge);
   }
 
+  // TODO: Clean this up
   /// Propagate the dynamics from the starting node
   fn propagate(&mut self, starting_node: usize) {
     self.build_tree(starting_node);
     self.assembled_modules = self.raw_modules.clone();
+    let mut tree_iter = self.node_ids[starting_node].descendants(&self.tree);
+    for c_node in tree_iter {
+      let c_node_id = *self.tree[c_node].get();
+      let mut tree_jiter = self.node_ids[c_node_id].descendants(&self.tree);
+      tree_jiter.next();
+
+      let mut through_node_id = c_node_id.clone();
+      for n_node in tree_jiter {
+        let n_node_id = *self.tree[n_node].get();
+
+        if let Some(other) = self.tree[n_node].parent() {
+          if other == c_node {
+            through_node_id = n_node_id.clone();
+          }
+        }
+
+        let (c_node_p_id, n_node_p_id) =
+          self.get_attachment_idxs_from_edge_list(c_node_id, through_node_id);
+
+        let c_pos = self.assembled_modules[c_node_id].p_vectors[c_node_p_id].clone();
+        let c_pos_total_cov = match c_pos {
+          Pos::Prob(pos) => pos.total_cov(),
+          Pos::Det(pos) => Array2::zeros((3, 3)),
+        };
+        let mut raw_pos = ProbPos::new_zero(1);
+        raw_pos
+          .covs
+          .slice_mut(s![0, .., ..])
+          .assign(&c_pos_total_cov);
+
+        for p_vec in self.assembled_modules[n_node_id].p_vectors.iter_mut() {
+          let n_pos = p_vec.clone();
+          *p_vec = n_pos + Pos::Prob(raw_pos.clone());
+        }
+      }
+    }
 
     let mut tree_iter = self.node_ids[starting_node].descendants(&self.tree);
-
     // skip the root
     tree_iter.next();
-
     for node_id in tree_iter {
       let (parent_id, current_id) = match self.tree[node_id].parent() {
         Some(parent_id) => (*self.tree[parent_id].get(), *self.tree[node_id].get()),
