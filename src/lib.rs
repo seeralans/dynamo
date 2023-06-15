@@ -23,7 +23,7 @@ pub struct DetPos {
 pub struct ProbPos {
   mus: Array2<f64>,
   covs: Array3<f64>,
-  weights: Vec<f64>,
+  weights: Array1<f64>,
   #[pyo3(get, set)]
   n_components: usize,
 }
@@ -188,7 +188,7 @@ impl Add for ProbPos {
 
     let mut mus = Array::zeros((self_n_comps * other_n_comps, self.mus.ncols()));
     let mut covs = Array::zeros((mus.nrows(), self.mus.ncols(), self.mus.ncols()));
-    let mut weights = vec![0.0; mus.nrows()];
+    let mut weights = Array::from_vec(vec![0.0; mus.nrows()]);
 
     for i in 0..self_n_comps {
       for j in 0..other_n_comps {
@@ -231,7 +231,7 @@ impl ProbPos {
     Self {
       mus: Array::zeros((n_components, 3)),
       covs: Array::zeros((n_components, 3, 3)),
-      weights: vec![1.0 / n_components as f64; n_components],
+      weights: Array::from_vec(vec![1.0 / n_components as f64; n_components]),
       n_components,
     }
   }
