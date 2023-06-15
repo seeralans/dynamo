@@ -373,6 +373,16 @@ impl ProbPos {
   fn __iadd__(&mut self, other: &Self) {
     self.add_mut(other);
   }
+
+  /// Return the weighted mean of the mixture.
+  fn mean(&self, py: Python) -> Py<PyArray1<f64>> {
+    self.total_mean().into_pyarray(py).to_owned()
+  }
+
+  /// Return the weighted cov of the mixture.
+  fn cov(&self, py: Python) -> Py<PyArray2<f64>> {
+    self.total_cov().into_pyarray(py).to_owned()
+  }
 }
 
 #[pymethods]
