@@ -810,6 +810,71 @@ mod tests {
   }
 
   #[test]
+  fn prob_pos_weigted_mean() {
+    let mut a = ProbPos::new_zero(3);
+    a.mus[[0, 0]] = 3.8;
+    a.mus[[2, 1]] = 7.8;
+    a.mus[[1, 0]] = 1.8;
+    a.mus[[1, 2]] = 9.8;
+
+    // mus = [
+    //   [3.8, 0.0, 0.0],
+    //   [1.8, 0.0, 9.8],
+    //   [0.0, 7.8, 0.0],
+    // ]
+    let weighted_mu = array![(3.8 + 1.8) / 3.0, (7.8) / 3.0, (9.8) / 3.0,];
+
+    assert_eq!(
+      true,
+      abs_diff_eq!(
+        (weighted_mu - a.total_mean()).sum(),
+        0.0,
+        epsilon = 0.0000001
+      )
+    );
+  }
+
+  #[test]
+  fn prob_pos_weigted_cov() {
+    let mut a = ProbPos::new_zero(2);
+
+    let mus = array![
+      [19.11174950, -3.80991797, -2.11702118],
+      [19.02044437, -4.25629735, -2.17426382],
+    ];
+
+    let covs = array![
+      [
+        [0.00740698, 0.01750531, 0.00219118],
+        [0.01750531, 0.06673698, 0.00875887],
+        [0.00219118, 0.00875887, 0.01309119],
+      ],
+      [
+        [0.00692701, 0.01411599, 0.00555987],
+        [0.01411599, 0.04624028, 0.01463649],
+        [0.00555987, 0.01463649, 0.01702779],
+      ]
+    ];
+
+    let weights = array![0.56388056, 0.43611944];
+
+    a.mus = mus.clone();
+    a.covs = covs.clone();
+    a.weights = weights.clone();
+
+    let total_cov = array![
+      [0.00924779, 0.02605003, 0.00494564],
+      [0.02605003, 0.10679851, 0.01760593],
+      [0.00494564, 0.01760593, 0.01561383],
+    ];
+
+    assert_eq!(
+      true,
+      abs_diff_eq!((total_cov - a.total_cov()).sum(), 0.0, epsilon = 0.0000001)
+    );
+  }
+
+  #[test]
   fn add_prob_pos_to_prob_pos_mus() {
     let mut a = ProbPos::new_zero(3);
     a.mus[[0, 0]] = 3.8;
