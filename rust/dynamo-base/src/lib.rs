@@ -267,6 +267,31 @@ impl ProbPos {
   fn prob_add(&self, other: Self) -> Self {
     self.clone() + other
   }
+
+  fn total_mean(&self) -> Array1<f64> {
+    self.weights.dot(&self.mus)
+  }
+
+  fn total_cov(&self) -> Array2<f64> {
+    // total sqaured mean
+    let mut total_s_mu = Array2::zeros((3, 3));
+
+    let total_mean = self.total_mean();
+
+    for i in 0..self.weights.len() {
+      let cov = self.covs.slice(s![i, .., ..]).into_owned();
+      let mu = self.mus.slice(s![i, ..]).into_owned();
+      let mu_s = mu.slice(s![.., NewAxis]).dot(&mu.slice(s![NewAxis, ..]));
+
+      let cum_term = &total_s_mu + self.weights[i] * (cov + mu_s);
+      total_s_mu.assign(&cum_term);
+    }
+
+    total_s_mu
+      - total_mean
+        .slice(s![.., NewAxis])
+        .dot(&total_mean.slice(s![NewAxis, ..]))
+  }
 }
 
 #[pymethods]
