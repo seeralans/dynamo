@@ -1,11 +1,11 @@
 [package]
-name = "protein-dynamics"
+name = "dynamo"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
-name = "protein_dynamics"
+name = "dynamo"
 crate-type = ["cdylib", "lib"]
 
 [dependencies]
