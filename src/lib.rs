@@ -361,6 +361,13 @@ impl ProbPos {
     Ok(())
   }
 
+  #[setter(weights)]
+  /// Set the covariance matrices of the Gaussian mixture.
+  fn set_weights(&mut self, weights: &PyArray1<f64>) -> PyResult<()> {
+    self.weights = weights.readonly().as_array().into_owned();
+    Ok(())
+  }
+
   /// add into memory
   /// TODO inefficient
   fn add_mut(&mut self, other: &Self) {
