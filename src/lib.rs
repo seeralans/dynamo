@@ -484,31 +484,6 @@ impl GeneralModule {
     }
   }
 
-  /// Transform this module such that it is attached to the other.
-  fn attachment_transform_mut(
-    &mut self,
-    c_att_pnt: usize,
-    o_att_pnt: usize,
-    other_module: &GeneralModule,
-  ) {
-    self.realign_module(c_att_pnt);
-
-    self.next_ref_frames[c_att_pnt] = other_module.next_ref_frames[o_att_pnt]
-      .view()
-      .dot(&self.next_ref_frames[c_att_pnt]);
-    self.p_vectors[c_att_pnt].rotate_mut(&other_module.next_ref_frames[o_att_pnt]);
-    self.centroid = other_module.centroid.clone() + other_module.p_vectors[o_att_pnt].clone();
-
-    for pos in self.tracked_points.iter_mut() {
-      let mut pos_c = pos.clone();
-      pos_c.rotate_mut(&other_module.next_ref_frames[o_att_pnt]);
-      match &self.centroid {
-        Pos::Prob(cent) => *pos = cent.clone() + pos_c,
-        Pos::Det(cent) => *pos = ProbPos::from(cent.clone()) + pos_c,
-      }
-    }
-  }
-
   fn get_p_vector(&self, idx: usize) -> ProbPos {
     match &self.p_vectors[idx] {
       Pos::Prob(x) => x.clone(),
