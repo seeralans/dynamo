@@ -348,12 +348,14 @@ impl ProbPos {
   }
 
   #[setter(mus)]
+  /// Set the meansof the Gaussian mixture.
   fn set_mus(&mut self, mus: &PyArray2<f64>) -> PyResult<()> {
     self.mus = mus.readonly().as_array().into_owned();
     Ok(())
   }
 
   #[setter(covs)]
+  /// Set the covariance matrices of the Gaussian mixture.
   fn set_covs(&mut self, covs: &PyArray3<f64>) -> PyResult<()> {
     self.covs = covs.readonly().as_array().into_owned();
     Ok(())
