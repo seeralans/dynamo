@@ -754,7 +754,7 @@ impl Construct {
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn protein_dynamics(_py: Python, m: &PyModule) -> PyResult<()> {
+fn dynamo(_py: Python, m: &PyModule) -> PyResult<()> {
   m.add_class::<ProbPos>()?;
   m.add_class::<Construct>()?;
   m.add_class::<DetPos>()?;
