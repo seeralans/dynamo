@@ -1043,4 +1043,94 @@ mod tests {
     construct.build_tree(4);
     assert_eq!(tree, construct.tree.clone());
   }
+  #[test]
+  fn build_tree_string() {
+    let edges = vec![
+      ((0, 1), (1, 0)),
+      ((1, 1), (2, 0)),
+      ((2, 1), (3, 0)),
+      ((3, 1), (4, 0)),
+      ((4, 1), (5, 0)),
+      ((5, 1), (6, 0)),
+      ((6, 1), (7, 0)),
+    ];
+
+    let adj: Array2<i64> = array![
+      [0, 1, 0, 0, 0, 0, 0, 0],
+      [1, 0, 1, 0, 0, 0, 0, 0],
+      [0, 1, 0, 1, 0, 0, 0, 0],
+      [0, 0, 1, 0, 1, 0, 0, 0],
+      [0, 0, 0, 1, 0, 1, 0, 0],
+      [0, 0, 0, 0, 1, 0, 1, 0],
+      [0, 0, 0, 0, 0, 1, 0, 1],
+      [0, 0, 0, 0, 0, 0, 1, 0],
+    ];
+
+    let mut tree = Arena::<usize>::new();
+    let mut flipped_tree = Arena::<usize>::new();
+    let mut branch_tree = Arena::<usize>::new();
+    let mut nodes: Vec<NodeId> = vec![];
+    let mut flipped_nodes: Vec<NodeId> = vec![];
+    let mut branch_nodes: Vec<NodeId> = vec![];
+    for i in 0..8 {
+      let node = tree.new_node(i);
+      let f_node = flipped_tree.new_node(i);
+      let b_node = branch_tree.new_node(i);
+      nodes.push(node);
+      flipped_nodes.push(f_node);
+      branch_nodes.push(f_node);
+    }
+
+    for i in 0..7 {
+      nodes[i].append(nodes[i + 1], &mut tree);
+      flipped_nodes[7 - i].append(flipped_nodes[6 - i], &mut flipped_tree);
+    }
+
+    branch_nodes[4].append(branch_nodes[3], &mut branch_tree);
+    branch_nodes[3].append(branch_nodes[2], &mut branch_tree);
+    branch_nodes[2].append(branch_nodes[1], &mut branch_tree);
+    branch_nodes[1].append(branch_nodes[0], &mut branch_tree);
+
+    branch_nodes[4].append(branch_nodes[5], &mut branch_tree);
+    branch_nodes[5].append(branch_nodes[6], &mut branch_tree);
+    branch_nodes[6].append(branch_nodes[7], &mut branch_tree);
+
+    let prob_poses = vec![ProbPos::new_zero(3)];
+    let next_ref_frames = vec![Array::eye(3)];
+    let module = GeneralModule::new(prob_poses.clone(), next_ref_frames.clone());
+    let modules = vec![module.clone(); 8];
+
+    let mut construct = Construct::new(modules, edges.clone());
+    construct.build_tree(0);
+    println!("zero {}", NodeId::debug_pretty_print(&nodes[0], &tree));
+    println!(
+      "zero c {}",
+      NodeId::debug_pretty_print(&construct.node_ids[0], &construct.tree)
+    );
+    assert_eq!(tree, construct.tree.clone());
+
+    construct.build_tree(7);
+    println!(
+      "flip {}",
+      NodeId::debug_pretty_print(&flipped_nodes[7], &flipped_tree)
+    );
+    println!(
+      "flip c {}",
+      NodeId::debug_pretty_print(&construct.node_ids[7], &construct.tree)
+    );
+    assert_eq!(flipped_tree, construct.tree.clone());
+
+    construct.build_tree(4);
+    println!(
+      "branch {}",
+      NodeId::debug_pretty_print(&branch_nodes[4], &branch_tree)
+    );
+    println!(
+      "branch c {}",
+      NodeId::debug_pretty_print(&construct.node_ids[4], &construct.tree)
+    );
+
+    construct.build_tree(4);
+    assert_eq!(branch_tree, construct.tree.clone());
+  }
 }
