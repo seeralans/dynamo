@@ -70,6 +70,9 @@ struct GeneralModule {
   /// a vector of reference frame of next modules
   next_ref_frames: Vec<Array2<f64>>,
 
+  /// reference frame 
+  ref_frame: Array2<f64>,
+
   /// tracked points:
   tracked_points: Vec<ProbPos>,
 
