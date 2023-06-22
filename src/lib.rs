@@ -506,6 +506,18 @@ impl GeneralModule {
     }
   }
 
+  fn rotate_mut(&mut self, rot_matrix: Array2<f64>) {
+    self.ref_frame = rot_matrix.dot(&self.ref_frame);
+    self.centroid.rotate_mut(&rot_matrix); 
+    for pos in self.p_vectors.iter_mut() {
+      pos.rotate_mut(&rot_matrix);
+    }
+    for pos in self.tracked_points.iter_mut() {
+      pos.rotate_mut(&rot_matrix);
+    }
+  }
+    
+  }
   /// Transform this module such that it is attached to the other.
   fn attachment_transform_mut(
     &mut self,
