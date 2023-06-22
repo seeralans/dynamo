@@ -547,6 +547,14 @@ impl GeneralModule {
 #[pymethods]
 impl GeneralModule {
   #[new]
+  /// GeneralModule(p_vectors, next_ref_frames)
+  /// Creates a GeneralModule
+  /// Parameters
+  /// ----------
+  /// p_vectors: list of ProbPos
+  /// next_ref_frames: list of 2d np.arrays corresponding to the p_vectors. Each column vector in
+  ///                  the array corresponds with x,y,z. The corresponding p_vector is aligned with
+  ///                  the first column vector.
   fn new_py(p_vectors: Vec<ProbPos>, next_ref_frames: Vec<&PyArray2<f64>>) -> Self {
     Self {
       centroid: Pos::Det(DetPos {
