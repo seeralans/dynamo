@@ -11,6 +11,8 @@ crate-type = ["cdylib", "lib"]
 [dependencies]
 pyo3 = { version = "0.18.1", features = ["extension-module"] }
 ndarray = { version = "0.15.6", features = ["rayon"] }
+openblas-src = "0.10.8"
+ndarray-linalg = {version = "0.16.0"}
 numpy = "0.18.0"
 approx = "0.5.0"
 num = "0.3.1"
