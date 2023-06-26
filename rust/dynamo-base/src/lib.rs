@@ -1005,6 +1005,33 @@ mod tests {
   }
 
   #[test]
+  fn translate_prob_pos() {
+    let cov = array![[1.0, 2.0, 3.0], [2.0, 2.4, 0.8], [3.0, 0.8, 1.3],];
+
+    let mu = array![3.8, 2.7, 9.2];
+
+    let mut a = ProbPos::new_zero(1);
+    a.mus[[0, 0]] = 3.8;
+    a.mus[[0, 1]] = 2.7;
+    a.mus[[0, 2]] = 9.2;
+
+    for i in 0..3 {
+      a.mus[[0, i]] = mu[[i]];
+      for j in 0..3 {
+        a.covs[[0, i, j]] = cov[[i, j]];
+      }
+    }
+
+    let rot_mat = array![[0.5, 0., 0.866], [0.866, 0., -0.5], [-0., 1., 0.]];
+
+    let trans = array![1.0, 2.0, 3.0];
+    let mu_r = mu + trans.clone();
+
+    a.translate_mut(&trans);
+    assert_eq!(a.mus.slice(s![0, ..]), mu_r);
+  }
+
+  #[test]
   fn build_adjacency_matrix_from_edges() {
     let edges = vec![
       ((0, 0), (1, 0)),
