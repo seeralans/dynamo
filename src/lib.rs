@@ -503,11 +503,8 @@ impl GeneralModule {
       labels: vec![0; 0],
       p_vectors: p_vectors.iter().map(|x| Pos::Prob(x.clone())).collect(),
       next_ref_frames: next_ref_frames,
+      ref_frame: Array::eye(3),
       tracked_points: vec![ProbPos::new_zero(1); 0],
-      align_p_idx: 0,
-    }
-  }
-
     }
   }
 
@@ -516,15 +513,19 @@ impl GeneralModule {
       centroid: module.centroid.clone(),
       p_vectors: vec![module.p_vector.clone()],
       next_ref_frames: vec![module.next_ref_frame.clone()],
+      ref_frame: Array::eye(3),
       tracked_points: module.tracked_points.clone(),
-      align_p_idx: 0,
       labels: module.labels.clone(),
     }
   }
 
+  /// Rotates the module by the given rotation matrix.
   fn rotate_mut(&mut self, rot_matrix: Array2<f64>) {
     self.ref_frame = rot_matrix.dot(&self.ref_frame);
-    self.centroid.rotate_mut(&rot_matrix); 
+    self.centroid.rotate_mut(&rot_matrix);
+    for ref_frame in self.next_ref_frames.iter_mut() {
+      *ref_frame = rot_matrix.dot(ref_frame);
+    }
     for pos in self.p_vectors.iter_mut() {
       pos.rotate_mut(&rot_matrix);
     }
