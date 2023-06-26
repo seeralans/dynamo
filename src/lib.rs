@@ -1138,6 +1138,7 @@ mod tests {
     construct.build_tree(4);
     assert_eq!(tree, construct.tree.clone());
   }
+
   #[test]
   fn build_tree_string() {
     let edges = vec![
