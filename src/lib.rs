@@ -617,8 +617,8 @@ impl GeneralModule {
         .iter()
         .map(|x| x.readonly().as_array().into_owned())
         .collect(),
+      ref_frame: Array::eye(3),
       tracked_points: vec![ProbPos::new_zero(1); 0],
-      align_p_idx: 0,
     }
   }
 
