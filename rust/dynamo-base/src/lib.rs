@@ -556,12 +556,32 @@ impl GeneralModule {
     o_att_pnt: usize,
     other_module: &GeneralModule,
   ) {
-    self.realign_module(c_att_pnt);
+    let other_ref_frame = other_module.ref_frame.view();
+    let other_attach_ref_frame = other_module.next_ref_frames[o_att_pnt].view();
 
-    self.next_ref_frames[c_att_pnt] = other_module.next_ref_frames[o_att_pnt]
-      .view()
-      .dot(&self.next_ref_frames[c_att_pnt]);
-    self.p_vectors[c_att_pnt].rotate_mut(&other_module.next_ref_frames[o_att_pnt]);
+    let mut attach_ref_frame = self.next_ref_frames[c_att_pnt].view().clone().to_owned();
+    attach_ref_frame[[0, 0]] = attach_ref_frame[[0, 0]] * -1.0;
+    attach_ref_frame[[1, 0]] = attach_ref_frame[[1, 0]] * -1.0;
+    attach_ref_frame[[2, 0]] = attach_ref_frame[[2, 0]] * -1.0;
+
+    let trans_mat = other_ref_frame.dot(&attach_ref_frame.inv().unwrap());
+
+    println!("before trans_mat {:#?}", trans_mat);
+    self.ref_frame.assign(&trans_mat.dot(&self.ref_frame));
+    println!("after trans_mat {:#?}", trans_mat);
+
+    // Get the transformation matrix T Rc = Ro but Rc the current reference frame is I (if
+    // standardised) T = R0
+    let trans_mat = other_module.next_ref_frames[o_att_pnt].view();
+
+    for ref_frame in self.next_ref_frames.iter_mut() {
+      *ref_frame = trans_mat.dot(ref_frame);
+    }
+
+    for p_vector in self.p_vectors.iter_mut() {
+      p_vector.rotate_mut(&trans_mat.clone().to_owned());
+    }
+
     self.centroid = other_module.centroid.clone() + other_module.p_vectors[o_att_pnt].clone();
 
     for pos in self.tracked_points.iter_mut() {
