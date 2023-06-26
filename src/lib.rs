@@ -692,10 +692,6 @@ impl Construct {
     tree: &mut Arena<usize>,
   ) {
     if let Some(c_node) = stack.pop() {
-      if adj.slice(s![c_node, ..]).sum() == 0 {
-        return;
-      }
-
       for i in 0..node_ids.len() {
         if adj[[c_node, i]] == 1 {
           node_ids[c_node].append(node_ids[i], tree);
