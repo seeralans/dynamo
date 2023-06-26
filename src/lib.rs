@@ -869,6 +869,7 @@ mod tests {
   use approx::abs_diff_eq;
   use ndarray::linalg::Dot;
   use ndarray::prelude::*;
+  use ndarray_linalg::assert_rclose;
   #[test]
   fn add_two_det_pos() {
     let a = DetPos {
