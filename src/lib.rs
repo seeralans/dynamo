@@ -532,8 +532,23 @@ impl GeneralModule {
       pos.rotate_mut(&rot_matrix);
     }
   }
-    
+
+  /// Translate this module by the given translation vector.
+  fn translate_mut(&mut self, trans: Array1<f64>) {
+    self.centroid.translate_mut(&trans);
+    for pos in self.p_vectors.iter_mut() {
+      pos.translate_mut(&trans);
+    }
+    for pos in self.tracked_points.iter_mut() {
+      pos.translate_mut(&trans);
+    }
   }
+
+
+  fn align_mut(&mut self, align_idx: usize) {
+
+  }
+
   /// Transform this module such that it is attached to the other.
   fn attachment_transform_mut(
     &mut self,
