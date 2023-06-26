@@ -102,6 +102,7 @@ pub struct Construct {
 pub trait Vector {
   fn get_mean_pos(&self) -> Array1<f64>;
   fn rotate_mut(&mut self, rot_mat: &Array2<f64>);
+  fn translate_mut(&mut self, trans: &Array1<f64>);
 }
 
 impl Vector for DetPos {
@@ -111,6 +112,10 @@ impl Vector for DetPos {
 
   fn rotate_mut(&mut self, rot_mat: &Array2<f64>) {
     self.pos = rot_mat.dot(&self.pos);
+  }
+
+  fn translate_mut(&mut self, trans: &Array1<f64>) {
+    self.pos += trans;
   }
 }
 
@@ -143,6 +148,13 @@ impl Vector for ProbPos {
         .assign(&rot_mat.dot(&cov_rot_t))
     }
   }
+
+  fn translate_mut(&mut self, trans: &Array1<f64>) {
+    for n in 0..self.n_components {
+      let mu = self.mus.slice(s![n, ..]).into_owned();
+      self.mus.slice_mut(s![n, ..]).assign(&(trans + &mu));
+    }
+  }
 }
 
 impl Vector for Pos {
@@ -157,6 +169,13 @@ impl Vector for Pos {
     match self {
       Self::Det(pos) => pos.rotate_mut(rot_mat),
       Self::Prob(pos) => pos.rotate_mut(rot_mat),
+    }
+  }
+
+  fn translate_mut(&mut self, trans: &Array1<f64>) {
+    match self {
+      Self::Det(pos) => pos.translate_mut(trans),
+      Self::Prob(pos) => pos.translate_mut(trans),
     }
   }
 }
