@@ -2,6 +2,7 @@ use indextree::Arena;
 use indextree::NodeId;
 use ndarray::linalg::Dot;
 use ndarray::prelude::*;
+use ndarray_linalg::Inverse;
 use pyo3::prelude::*;
 use std::ops::Add;
 
