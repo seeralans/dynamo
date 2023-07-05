@@ -875,9 +875,9 @@ mod tests {
 
     let c = a + b;
 
-    assert_eq!(true, abs_diff_eq!(c.pos[[0]], 235.2, epsilon = 0.0000001));
-    assert_eq!(true, abs_diff_eq!(c.pos[[1]], 20.7, epsilon = 0.0000001));
-    assert_eq!(true, abs_diff_eq!(c.pos[[2]], 1.3, epsilon = 0.0000001));
+    assert!(abs_diff_eq!(c.pos[[0]], 235.2, epsilon = 0.0000001));
+    assert!(abs_diff_eq!(c.pos[[1]], 20.7, epsilon = 0.0000001));
+    assert!(abs_diff_eq!(c.pos[[2]], 1.3, epsilon = 0.0000001));
   }
 
   #[test]
@@ -892,13 +892,11 @@ mod tests {
 
     let c = b.det_add(a);
 
-    assert_eq!(true, abs_diff_eq!(c.mus[[0, 0]], 0.4, epsilon = 0.0000001));
-    assert_eq!(
-      true,
+    assert!(abs_diff_eq!(c.mus[[0, 0]], 0.4, epsilon = 0.0000001));
+    assert!(
       abs_diff_eq!(c.mus[[1, 0]], 3.8 + 0.4, epsilon = 0.0000001)
     );
-    assert_eq!(
-      true,
+    assert!(
       abs_diff_eq!(c.mus[[1, 1]], 7.8 + 20.5, epsilon = 0.0000001)
     );
   }
@@ -918,8 +916,7 @@ mod tests {
     // ]
     let weighted_mu = array![(3.8 + 1.8) / 3.0, (7.8) / 3.0, (9.8) / 3.0,];
 
-    assert_eq!(
-      true,
+    assert!(
       abs_diff_eq!(
         (weighted_mu - a.total_mean()).sum(),
         0.0,
@@ -981,32 +978,28 @@ mod tests {
     let c = a.clone() + b.clone();
 
     assert_eq!(c.mus.len_of(Axis(0)), 6);
-    assert_eq!(
-      true,
+    assert!(
       abs_diff_eq!(
         c.mus[[0, 0]],
         a.mus[[0, 0]] + b.mus[[0, 0]],
         epsilon = 0.0000001
       )
     );
-    assert_eq!(
-      true,
+    assert!(
       abs_diff_eq!(
         c.mus[[1, 0]],
         a.mus[[0, 0]] + b.mus[[1, 0]],
         epsilon = 0.0000001
       )
     );
-    assert_eq!(
-      true,
+    assert!(
       abs_diff_eq!(
         c.mus[[4, 1]],
         a.mus[[2, 1]] + b.mus[[0, 1]],
         epsilon = 0.0000001
       )
     );
-    assert_eq!(
-      true,
+    assert!(
       abs_diff_eq!(
         c.mus[[5, 1]],
         a.mus[[2, 1]] + b.mus[[1, 1]],
