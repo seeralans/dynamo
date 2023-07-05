@@ -506,6 +506,7 @@ impl Module {
   }
 }
 
+#[allow(dead_code)]
 impl GeneralModule {
   fn new(p_vectors: Vec<ProbPos>, next_ref_frames: Vec<Array2<f64>>) -> Self {
     Self {
