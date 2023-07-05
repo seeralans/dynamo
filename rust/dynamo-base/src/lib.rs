@@ -545,11 +545,6 @@ impl GeneralModule {
     }
   }
 
-
-  fn align_mut(&mut self, align_idx: usize) {
-
-  }
-
   /// Transform this module such that it is attached to the other.
   fn attachment_transform_mut(
     &mut self,
