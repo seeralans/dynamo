@@ -341,10 +341,8 @@ impl ProbPos {
       covs: covs.readonly().as_array().into_owned(),
       weights: weights
         .readonly()
-        .readonly()
         .as_array()
-        .iter()
-        .map(|a| *a as f64)
+        .iter().copied()
         .collect(),
       n_components: mus.readonly().as_array().nrows(),
     }
