@@ -949,9 +949,9 @@ mod tests {
 
     let weights = array![0.56388056, 0.43611944];
 
-    a.mus = mus.clone();
-    a.covs = covs.clone();
-    a.weights = weights.clone();
+    a.mus = mus;
+    a.covs = covs;
+    a.weights = weights;
 
     let total_cov = array![
       [0.00924779, 0.02605003, 0.00494564],
