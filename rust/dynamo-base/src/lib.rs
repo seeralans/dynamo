@@ -727,7 +727,6 @@ impl Construct {
       }
     }
     panic!("parent and current do not have an edge!");
-    (0, 0)
   }
 }
 
