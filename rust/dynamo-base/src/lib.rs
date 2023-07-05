@@ -670,6 +670,11 @@ impl GeneralModule {
   fn set_tracked_points(&mut self, tracked_points: Vec<ProbPos>) {
     self.tracked_points = tracked_points;
   }
+
+  #[getter(ref_frame)]
+  fn get_ref_frame(&self, py: Python) -> Py<PyArray2<f64>> {
+    self.ref_frame.clone().into_pyarray(py).to_owned()
+  }
 }
 
 impl Construct {
