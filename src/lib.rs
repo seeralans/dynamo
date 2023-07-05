@@ -1115,10 +1115,10 @@ mod tests {
 
     let prob_poses = vec![ProbPos::new_zero(3)];
     let next_ref_frames = vec![Array::eye(3)];
-    let module = GeneralModule::new(prob_poses.clone(), next_ref_frames.clone());
-    let modules = vec![module.clone(); 5];
+    let module = GeneralModule::new(prob_poses, next_ref_frames);
+    let modules = vec![module; 5];
 
-    let mut construct = Construct::new(modules, edges.clone());
+    let mut construct = Construct::new(modules, edges);
     construct.build_tree(1);
     construct.build_tree(4);
     assert_eq!(tree, construct.tree.clone());
