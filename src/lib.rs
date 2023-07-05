@@ -1,15 +1,14 @@
 use indextree::Arena;
 use indextree::NodeId;
-use ndarray::linalg::Dot;
 use ndarray::prelude::*;
-use ndarray_linalg::Inverse;
+
 use pyo3::prelude::*;
 use std::ops::Add;
 
-use numpy::{IntoPyArray, PyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1};
-use pyo3::prelude::*;
-use pyo3::types::PyComplex;
-use pyo3::wrap_pyfunction;
+use numpy::{IntoPyArray, PyArray1, PyArray2, PyArray3};
+
+
+
 extern crate openblas_src;
 
 #[pyclass]
