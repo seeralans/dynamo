@@ -136,7 +136,7 @@ impl Vector for ProbPos {
     for n in 0..self.n_components {
       let mu = self.mus.slice(s![n, ..]).into_owned();
       self.mus.slice_mut(s![n, ..]).assign(&rot_mat.dot(&mu));
-      let mut cov = self.covs.slice(s![n, .., ..]).into_owned();
+      let cov = self.covs.slice(s![n, .., ..]).into_owned();
       let mut cov_rot_t = self.covs.slice(s![n, .., ..]).into_owned();
       cov_rot_t
         .slice_mut(s![.., ..])
