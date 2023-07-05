@@ -458,7 +458,7 @@ impl Module {
   fn get_p_vector(&self) -> ProbPos {
     match &self.p_vector {
       Pos::Prob(x) => x.clone(),
-      Pos::Det(x) => ProbPos::new_zero(1),
+      Pos::Det(x) => ProbPos::from(x.clone()),
     }
   }
 
