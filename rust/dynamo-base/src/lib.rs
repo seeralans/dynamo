@@ -620,7 +620,7 @@ impl GeneralModule {
   fn get_p_vector(&self, idx: usize) -> ProbPos {
     match &self.p_vectors[idx] {
       Pos::Prob(x) => x.clone(),
-      Pos::Det(x) => ProbPos::new_zero(1),
+      Pos::Det(x) => ProbPos::from(x),
     }
   }
 
@@ -644,7 +644,7 @@ impl GeneralModule {
   fn get_centroid(&self) -> ProbPos {
     match &self.centroid {
       Pos::Prob(x) => x.clone(),
-      Pos::Det(x) => ProbPos::new_zero(1),
+      Pos::Det(x) => ProbPos::from(x),
     }
   }
 
