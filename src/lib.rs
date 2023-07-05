@@ -196,6 +196,14 @@ impl From<DetPos> for ProbPos {
   }
 }
 
+impl From<&DetPos> for ProbPos {
+  fn from(det_pos: &DetPos) -> Self {
+    let mut pos = Self::new_zero(0);
+    pos.mus.slice_mut(s![0, ..]).assign(&det_pos.pos);
+    pos
+  }
+}
+
 /// Allows one to use the '+'  operator on two ProbPos
 impl Add for ProbPos {
   type Output = Self;
