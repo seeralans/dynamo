@@ -564,7 +564,7 @@ impl GeneralModule {
     other_module: &GeneralModule,
   ) {
     let other_attach_ref_frame = other_module.next_ref_frames[o_att_pnt].view();
-    let trans_mat = other_attach_ref_frame.clone();
+    let trans_mat = other_attach_ref_frame;
 
     self.ref_frame.assign(&trans_mat);
 
