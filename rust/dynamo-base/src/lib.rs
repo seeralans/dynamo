@@ -243,6 +243,7 @@ impl Add for Pos {
   }
 }
 
+#[allow(dead_code)]
 impl ProbPos {
   /// create a new zero vector
   fn new_zero(n_components: usize) -> Self {
