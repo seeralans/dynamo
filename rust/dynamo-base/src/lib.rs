@@ -827,12 +827,11 @@ impl Construct {
         }
       };
 
-      let (parent_p_id, current_p_id) =
+      let (parent_p_id, _) =
         self.get_attachment_idxs_from_edge_list(parent_id, current_id);
 
       let mut current_module = self.assembled_modules[current_id].clone();
       current_module.attachment_transform_mut(
-        current_p_id,
         parent_p_id,
         &self.assembled_modules[parent_id],
       );
