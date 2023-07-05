@@ -560,7 +560,6 @@ impl GeneralModule {
   /// Transform this module such that it is attached to the other.
   fn attachment_transform_mut(
     &mut self,
-    c_att_pnt: usize,
     o_att_pnt: usize,
     other_module: &GeneralModule,
   ) {
