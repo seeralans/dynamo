@@ -824,7 +824,6 @@ impl Construct {
         Some(parent_id) => (*self.tree[parent_id].get(), *self.tree[node_id].get()),
         None => {
           panic!("Current node has no parent!");
-          (0, *self.tree[node_id].get())
         }
       };
 
