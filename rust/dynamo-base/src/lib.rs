@@ -1156,7 +1156,6 @@ mod tests {
     for i in 0..8 {
       let node = tree.new_node(i);
       let f_node = flipped_tree.new_node(i);
-      let b_node = branch_tree.new_node(i);
       nodes.push(node);
       flipped_nodes.push(f_node);
       branch_nodes.push(f_node);
