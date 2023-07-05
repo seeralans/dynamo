@@ -506,7 +506,7 @@ impl GeneralModule {
       }),
       labels: vec![0; 0],
       p_vectors: p_vectors.iter().map(|x| Pos::Prob(x.clone())).collect(),
-      next_ref_frames: next_ref_frames,
+      next_ref_frames,
       ref_frame: Array::eye(3),
       tracked_points: vec![ProbPos::new_zero(1); 0],
     }
@@ -519,7 +519,7 @@ impl GeneralModule {
       next_ref_frames: vec![module.next_ref_frame.clone()],
       ref_frame: Array::eye(3),
       tracked_points: module.tracked_points.clone(),
-      labels: module.labels.clone(),
+      labels: module.labels,
     }
   }
 
