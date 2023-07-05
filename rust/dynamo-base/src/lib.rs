@@ -959,8 +959,7 @@ mod tests {
       [0.00494564, 0.01760593, 0.01561383],
     ];
 
-    assert_eq!(
-      true,
+    assert!(
       abs_diff_eq!((total_cov - a.total_cov()).sum(), 0.0, epsilon = 0.0000001)
     );
   }
