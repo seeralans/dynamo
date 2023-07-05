@@ -409,6 +409,12 @@ impl ProbPos {
   fn cov(&self, py: Python) -> Py<PyArray2<f64>> {
     self.total_cov().into_pyarray(py).to_owned()
   }
+
+  /// Rotate transform
+  fn transform(&mut self, trans_mat: &PyArray2<f64>) -> PyResult<()> {
+    self.rotate_mut(&trans_mat.readonly().as_array().into_owned());
+    Ok(())
+  }
 }
 
 #[pymethods]
