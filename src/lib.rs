@@ -1027,9 +1027,9 @@ mod tests {
 
     let rot_mat = array![[0.5, 0., 0.866], [0.866, 0., -0.5], [-0., 1., 0.]];
 
-    let mu_r = (&rot_mat.dot(&mu));
-    let cov_r = (&cov.dot(&rot_mat.t())).to_owned();
-    let cov_r = (&rot_mat.dot(&cov_r));
+    let mu_r = &rot_mat.dot(&mu);
+    let cov_r = cov.dot(&rot_mat.t()).to_owned();
+    let cov_r = &rot_mat.dot(&cov_r);
 
     a.rotate_mut(&rot_mat);
 
