@@ -697,14 +697,11 @@ impl Construct {
           node_ids[c_node].append(node_ids[i], tree);
           adj[[i, c_node]] = 0;
           stack.push(i);
-        } else {
-        }
+        } 
       }
 
       Construct::build_tree_inner(stack, node_ids, adj, tree);
-    } else {
-      return;
-    }
+    } 
   }
 
   // TODO: It may be possible to remove the edges without re-initiallizing the tree
