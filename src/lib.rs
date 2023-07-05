@@ -482,7 +482,7 @@ impl Module {
   fn get_centroid(&self) -> ProbPos {
     match &self.centroid {
       Pos::Prob(x) => x.clone(),
-      Pos::Det(x) => ProbPos::new_zero(1),
+      Pos::Det(x) => ProbPos::from(x),
     }
   }
 
