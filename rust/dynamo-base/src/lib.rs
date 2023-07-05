@@ -7,8 +7,6 @@ use std::ops::Add;
 
 use numpy::{IntoPyArray, PyArray1, PyArray2, PyArray3};
 
-
-
 extern crate openblas_src;
 
 #[pyclass]
@@ -348,11 +346,7 @@ impl ProbPos {
     Self {
       mus: mus.readonly().as_array().into_owned(),
       covs: covs.readonly().as_array().into_owned(),
-      weights: weights
-        .readonly()
-        .as_array()
-        .iter().copied()
-        .collect(),
+      weights: weights.readonly().as_array().iter().copied().collect(),
       n_components: mus.readonly().as_array().nrows(),
     }
   }
@@ -559,11 +553,7 @@ impl GeneralModule {
   }
 
   /// Transform this module such that it is attached to the other.
-  fn attachment_transform_mut(
-    &mut self,
-    o_att_pnt: usize,
-    other_module: &GeneralModule,
-  ) {
+  fn attachment_transform_mut(&mut self, o_att_pnt: usize, other_module: &GeneralModule) {
     let other_attach_ref_frame = other_module.next_ref_frames[o_att_pnt].view();
     let trans_mat = other_attach_ref_frame;
 
@@ -697,11 +687,11 @@ impl Construct {
           node_ids[c_node].append(node_ids[i], tree);
           adj[[i, c_node]] = 0;
           stack.push(i);
-        } 
+        }
       }
 
       Construct::build_tree_inner(stack, node_ids, adj, tree);
-    } 
+    }
   }
 
   // TODO: It may be possible to remove the edges without re-initiallizing the tree
@@ -828,14 +818,10 @@ impl Construct {
         }
       };
 
-      let (parent_p_id, _) =
-        self.get_attachment_idxs_from_edge_list(parent_id, current_id);
+      let (parent_p_id, _) = self.get_attachment_idxs_from_edge_list(parent_id, current_id);
 
       let mut current_module = self.assembled_modules[current_id].clone();
-      current_module.attachment_transform_mut(
-        parent_p_id,
-        &self.assembled_modules[parent_id],
-      );
+      current_module.attachment_transform_mut(parent_p_id, &self.assembled_modules[parent_id]);
 
       self.assembled_modules[current_id] = current_module;
     }
@@ -861,9 +847,7 @@ fn dynamo(_py: Python, m: &PyModule) -> PyResult<()> {
 mod tests {
   use super::*;
   use approx::abs_diff_eq;
-  use ndarray::linalg::Dot;
-  
-  
+
   #[test]
   fn add_two_det_pos() {
     let a = DetPos {
@@ -894,12 +878,8 @@ mod tests {
     let c = b.det_add(a);
 
     assert!(abs_diff_eq!(c.mus[[0, 0]], 0.4, epsilon = 0.0000001));
-    assert!(
-      abs_diff_eq!(c.mus[[1, 0]], 3.8 + 0.4, epsilon = 0.0000001)
-    );
-    assert!(
-      abs_diff_eq!(c.mus[[1, 1]], 7.8 + 20.5, epsilon = 0.0000001)
-    );
+    assert!(abs_diff_eq!(c.mus[[1, 0]], 3.8 + 0.4, epsilon = 0.0000001));
+    assert!(abs_diff_eq!(c.mus[[1, 1]], 7.8 + 20.5, epsilon = 0.0000001));
   }
 
   #[test]
@@ -917,13 +897,11 @@ mod tests {
     // ]
     let weighted_mu = array![(3.8 + 1.8) / 3.0, (7.8) / 3.0, (9.8) / 3.0,];
 
-    assert!(
-      abs_diff_eq!(
-        (weighted_mu - a.total_mean()).sum(),
-        0.0,
-        epsilon = 0.0000001
-      )
-    );
+    assert!(abs_diff_eq!(
+      (weighted_mu - a.total_mean()).sum(),
+      0.0,
+      epsilon = 0.0000001
+    ));
   }
 
   #[test]
@@ -960,9 +938,11 @@ mod tests {
       [0.00494564, 0.01760593, 0.01561383],
     ];
 
-    assert!(
-      abs_diff_eq!((total_cov - a.total_cov()).sum(), 0.0, epsilon = 0.0000001)
-    );
+    assert!(abs_diff_eq!(
+      (total_cov - a.total_cov()).sum(),
+      0.0,
+      epsilon = 0.0000001
+    ));
   }
 
   #[test]
@@ -978,34 +958,26 @@ mod tests {
     let c = a.clone() + b.clone();
 
     assert_eq!(c.mus.len_of(Axis(0)), 6);
-    assert!(
-      abs_diff_eq!(
-        c.mus[[0, 0]],
-        a.mus[[0, 0]] + b.mus[[0, 0]],
-        epsilon = 0.0000001
-      )
-    );
-    assert!(
-      abs_diff_eq!(
-        c.mus[[1, 0]],
-        a.mus[[0, 0]] + b.mus[[1, 0]],
-        epsilon = 0.0000001
-      )
-    );
-    assert!(
-      abs_diff_eq!(
-        c.mus[[4, 1]],
-        a.mus[[2, 1]] + b.mus[[0, 1]],
-        epsilon = 0.0000001
-      )
-    );
-    assert!(
-      abs_diff_eq!(
-        c.mus[[5, 1]],
-        a.mus[[2, 1]] + b.mus[[1, 1]],
-        epsilon = 0.0000001
-      )
-    );
+    assert!(abs_diff_eq!(
+      c.mus[[0, 0]],
+      a.mus[[0, 0]] + b.mus[[0, 0]],
+      epsilon = 0.0000001
+    ));
+    assert!(abs_diff_eq!(
+      c.mus[[1, 0]],
+      a.mus[[0, 0]] + b.mus[[1, 0]],
+      epsilon = 0.0000001
+    ));
+    assert!(abs_diff_eq!(
+      c.mus[[4, 1]],
+      a.mus[[2, 1]] + b.mus[[0, 1]],
+      epsilon = 0.0000001
+    ));
+    assert!(abs_diff_eq!(
+      c.mus[[5, 1]],
+      a.mus[[2, 1]] + b.mus[[1, 1]],
+      epsilon = 0.0000001
+    ));
   }
 
   #[test]
