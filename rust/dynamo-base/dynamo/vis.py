@@ -156,13 +156,19 @@ def draw_helices(
         )
 
 
-def visualise_centroids(
+def draw_fins_from_means_and_variances(
     means,
     variances,
     fig,
-    centroid_tube_colour=(1.0, 1.0, 1.0),
     interp_points=None,
     fin_dims=[0, 1],
+    arrow_colours = [(1.0, 0.2, 0.2),
+                     (0.2, 1.0, 0.2),
+                     (0.2, 0.2, 1.0)],
+    centroid_colour=(1.0, 1.0, 1.0),
+    centroid_tube_colour=(1.0, 1.0, 1.0),
+    centroid_tube_radius=0.1,
+    fin_colourmap='viridis',
 ):
     """
     Uses fins to visualise the dynamics of centroids.
@@ -173,7 +179,12 @@ def visualise_centroids(
       Optional:
         centroid_tube_colour (tuple): colour of the tube around the centroids
         interp_points (int): number of points to interpolate between each point
-        fin_dims (list): dimensions to draw fins for
+        fin_dims (list): the idxs of fins for which to draw, e.g. [0] will draw fins
+                         for the largest component
+        arrow_colours (list): colours of the arrows for the three directions
+        centroid_colour (tuple): colour of the centroids
+        centroid_tube_radius (float): radius of the tube around the centroids
+        fin_colourmap (str): colormap to use for the fins
     Returns:
       None
     """
@@ -186,20 +197,19 @@ def visualise_centroids(
 
     # plot centroids
     mlab.points3d(
-        *means.T, scale_factor=1, scale_mode="none", figure=fig, color=(1.0, 1.0, 1.0)
+        *means.T, scale_factor=1, scale_mode="none", figure=fig, color=centroid_colour,
     )
 
     # plot centroids tube
     mlab.plot3d(
-        *smooth_it(means).T, tube_radius=0.1, color=centroid_tube_colour, figure=fig
+        *smooth_it(means).T, tube_radius=centroid_tube_radius, color=centroid_tube_colour, figure=fig
     )
 
     # compute eig
     eigs = [sorted_eig(var) for var in variances]
     eigvals = np.array([vals for vals, _ in eigs])
 
-    # colours for the free directions
-    arrow_colours = [(1.0, 0.2, 0.2), (0.2, 1.0, 0.2), (0.2, 0.2, 1.0)]
+    # colours for the three directions
 
     num_centroids = len(means)
     vecs = np.zeros((num_centroids, 3, 3, 3))
@@ -220,6 +230,6 @@ def visualise_centroids(
             smooth_it(lower),
             smooth_it(eigvals[:, 0][:, None])[:, 0],
             fig,
-            colormap="viridis",
+            colormap=fin_colourmap,
         )
     return
