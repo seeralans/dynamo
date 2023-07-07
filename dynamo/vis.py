@@ -233,3 +233,19 @@ def draw_fins_from_means_and_variances(
             colormap=fin_colourmap,
         )
     return
+
+
+def visualise_centroids_of_modules(modules, fig3d, **kwargs):
+    """
+    Visualises the centroids of modules using the fins representation.
+    Parameters:
+        modules (list): list of modules to be visualised
+        fig3d (mlab.figure): figure to plot on
+    Optional:
+        **kwargs: keyword arguments to be passed to draw_fins_from_means_and_variances
+    """
+    centroids = [mod.centroid for mod in modules]
+    centroid_mus = np.array([centroid.mean() for centroid in centroids])
+    centroid_vas = np.array([centroid.cov() for centroid in centroids])
+    draw_fins_from_means_and_variances(centroid_mus, centroid_vas, fig3d, **kwargs)
+
