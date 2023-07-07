@@ -1,15 +1,42 @@
 #+title: Dynamo
 
-Rust+Python library for evaluating the steady-state dynamics of large bio-molecular constructs using
+Native Python library built in rust for evaluating the steady-state dynamics of large bio-molecular
+constructs.
 
 * Features:
 - Ability to represent any tree structure where the nodes are modules.
-- Used as a standalone rust library or via the python api
-
-* Dependencies
-...
+- Used as a standalone rust library or via the python API
 
 * Installation
 
+** Installing build tools
+Install rust using rustup
+#+begin_src shell
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+#+end_src
+
+#+begin_src shell
+pip install maturin
+#+end_src
+
+#+begin_src shell
+cargo install maturin
+#+end_src
+
+** Building and install ~dynamo~
+#+begin_src shell
+git clone git@github.com:seeralans/dynamo.git
+cd dynamo
+maturin build
+pip install target/dynamo.xx.whl  
+#+end_src
+
+** Install Python dependencies
+#+begin_src shell
+pip install numpy mayavi
+#+end_src
+
+
 * Example
 ** TODO add a jupyter notebook with minimal 
+
