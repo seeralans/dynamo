@@ -169,6 +169,7 @@ def draw_fins_from_means_and_variances(
     centroid_tube_colour=(1.0, 1.0, 1.0),
     centroid_tube_radius=0.1,
     fin_colourmap='viridis',
+    **kwargs,
 ):
     """
     Uses fins to visualise the dynamics of centroids.
@@ -185,6 +186,7 @@ def draw_fins_from_means_and_variances(
         centroid_colour (tuple): colour of the centroids
         centroid_tube_radius (float): radius of the tube around the centroids
         fin_colourmap (str): colormap to use for the fins
+        **kwargs: keyword arguments to be passed to draw_fins_between_two_curves
     Returns:
       None
     """
@@ -228,9 +230,10 @@ def draw_fins_from_means_and_variances(
         draw_fins_between_two_curves(
             smooth_it(upper),
             smooth_it(lower),
-            smooth_it(eigvals[:, 0][:, None])[:, 0],
+            smooth_it(eigvals[:, dim][:, None])[:, 0],
             fig,
             colormap=fin_colourmap,
+            **kwargs,
         )
     return
 
