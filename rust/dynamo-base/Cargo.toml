@@ -1,0 +1,31 @@
+[package]
+name = "dynamo"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "dynamo"
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+pyo3 = { version = "0.18.1", features = ["extension-module"] }
+ndarray = { version = "0.15.6", features = ["rayon"] }
+openblas-src = "0.10.8"
+ndarray-linalg = {version = "0.16.0"}
+numpy = "0.18.0"
+approx = "0.5.0"
+num = "0.3.1"
+cargo-watch = "8.4.0"
+indextree = "4.6.0"
+# ndarray-linalg = "0.16.0"
+
+# ndarray = { version = "0.14.0", features = ["rayon"] }
+# numpy = "0.13.1"
+
+
+[profile.dev]
+opt-level = 3
+
+[profile.release]
+opt-level = 3
