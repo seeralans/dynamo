@@ -3,9 +3,11 @@ use indextree::NodeId;
 use ndarray::prelude::*;
 
 use pyo3::prelude::*;
+use pyo3::prelude::Bound as PyBound;
 use std::ops::Add;
 
 use numpy::{IntoPyArray, PyArray1, PyArray2, PyArray3};
+use numpy::PyArrayMethods;
 
 extern crate openblas_src;
 
@@ -322,30 +324,30 @@ impl ProbPos {
 #[pymethods]
 impl DetPos {
   #[new]
-  fn new(array_pos: &PyArray1<f64>) -> Self {
+  fn new(array_pos: &PyBound<PyArray1<f64>>) -> Self {
     Self {
-      pos: array_pos.readonly().as_array().into_owned(),
+      pos: array_pos.readonly().as_array().to_owned(),
     }
   }
 
   #[getter(pos)]
   fn get_pos(&self, py: Python) -> Py<PyArray1<f64>> {
-    self.pos.clone().into_pyarray(py).to_owned()
+      self.pos.clone().into_pyarray(py).unbind()
   }
 
   #[setter(pos)]
-  fn set_pos(&mut self, array_pos: &PyArray1<f64>) {
-    self.pos = array_pos.readonly().as_array().into_owned();
+  fn set_pos(&mut self, array_pos: &PyBound<PyArray1<f64>>) {
+    self.pos = array_pos.readonly().as_array().to_owned();
   }
 }
 
 #[pymethods]
 impl ProbPos {
   #[new]
-  fn new(mus: &PyArray2<f64>, covs: &PyArray3<f64>, weights: &PyArray1<f64>) -> Self {
+  fn new(mus: &PyBound<PyArray2<f64>>, covs: &PyBound<PyArray3<f64>>, weights: &PyBound<PyArray1<f64>>) -> Self {
     Self {
-      mus: mus.readonly().as_array().into_owned(),
-      covs: covs.readonly().as_array().into_owned(),
+      mus: mus.readonly().as_array().to_owned(),
+      covs: covs.readonly().as_array().to_owned(),
       weights: weights.readonly().as_array().iter().copied().collect(),
       n_components: mus.readonly().as_array().nrows(),
     }
@@ -353,40 +355,40 @@ impl ProbPos {
 
   #[getter(weights)]
   fn get_weights(&self, py: Python) -> Py<PyArray1<f64>> {
-    self.weights.clone().into_pyarray(py).to_owned()
+    self.weights.clone().into_pyarray(py).unbind()
   }
-
+  
   #[getter(mus)]
   fn get_mus(&self, py: Python) -> Py<PyArray2<f64>> {
-    self.mus.clone().into_pyarray(py).to_owned()
+      self.mus.clone().into_pyarray(py).unbind()
   }
-
+  
   #[getter(covs)]
   fn get_covs(&self, py: Python) -> Py<PyArray3<f64>> {
-    self.covs.clone().into_pyarray(py).to_owned()
+    self.covs.clone().into_pyarray(py).unbind()
   }
-
+  
   #[setter(mus)]
   /// Set the meansof the Gaussian mixture.
-  fn set_mus(&mut self, mus: &PyArray2<f64>) -> PyResult<()> {
-    self.mus = mus.readonly().as_array().into_owned();
+  fn set_mus(&mut self, mus: &PyBound<PyArray2<f64>>) -> PyResult<()> {
+    self.mus = mus.readonly().as_array().to_owned();
     Ok(())
   }
-
+  
   #[setter(covs)]
   /// Set the covariance matrices of the Gaussian mixture.
-  fn set_covs(&mut self, covs: &PyArray3<f64>) -> PyResult<()> {
-    self.covs = covs.readonly().as_array().into_owned();
+  fn set_covs(&mut self, covs: &PyBound<PyArray3<f64>>) -> PyResult<()> {
+    self.covs = covs.readonly().as_array().to_owned();
     Ok(())
   }
-
+  
   #[setter(weights)]
   /// Set the covariance matrices of the Gaussian mixture.
-  fn set_weights(&mut self, weights: &PyArray1<f64>) -> PyResult<()> {
-    self.weights = weights.readonly().as_array().into_owned();
+  fn set_weights(&mut self, weights: &PyBound<PyArray1<f64>>) -> PyResult<()> {
+    self.weights = weights.readonly().as_array().to_owned();
     Ok(())
   }
-
+  
   /// add into memory
   /// TODO inefficient
   fn add_mut(&mut self, other: &Self) {
@@ -395,24 +397,24 @@ impl ProbPos {
     self.weights = c.weights;
     self.covs = c.covs;
   }
-
+  
   fn __iadd__(&mut self, other: &Self) {
     self.add_mut(other);
   }
-
+  
   /// Return the weighted mean of the mixture.
   fn mean(&self, py: Python) -> Py<PyArray1<f64>> {
-    self.total_mean().into_pyarray(py).to_owned()
+    self.total_mean().into_pyarray(py).unbind()
   }
-
+  
   /// Return the weighted cov of the mixture.
   fn cov(&self, py: Python) -> Py<PyArray2<f64>> {
-    self.total_cov().into_pyarray(py).to_owned()
+    self.total_cov().into_pyarray(py).unbind()
   }
-
+  
   /// Rotate transform
-  fn transform(&mut self, trans_mat: &PyArray2<f64>) -> PyResult<()> {
-    self.rotate_mut(&trans_mat.readonly().as_array().into_owned());
+  fn transform(&mut self, trans_mat: &PyBound<PyArray2<f64>>) -> PyResult<()> {
+    self.rotate_mut(&trans_mat.readonly().as_array().to_owned());
     Ok(())
   }
 }
@@ -420,14 +422,14 @@ impl ProbPos {
 #[pymethods]
 impl Module {
   #[new]
-  fn new(p_vector: ProbPos, next_ref_frame: &PyArray2<f64>) -> Self {
+  fn new(p_vector: ProbPos, next_ref_frame: &PyBound<PyArray2<f64>>) -> Self {
     Self {
       centroid: Pos::Det(DetPos {
         pos: array![0.0, 0.0, 0.0],
       }),
       labels: vec![0; 0],
       p_vector: Pos::Prob(p_vector),
-      next_ref_frame: next_ref_frame.readonly().as_array().into_owned(),
+      next_ref_frame: next_ref_frame.readonly().as_array().to_owned(),
       tracked_points: vec![ProbPos::new_zero(1); 0],
     }
   }
@@ -466,12 +468,12 @@ impl Module {
 
   #[getter(next_ref_frame)]
   fn get_next_ref_frame(&self, py: Python) -> Py<PyArray2<f64>> {
-    self.next_ref_frame.clone().into_pyarray(py).to_owned()
+    self.next_ref_frame.clone().into_pyarray(py).unbind()
   }
 
   #[setter(next_ref_frame)]
-  fn set_next_ref_frame(&mut self, next_ref_frame: &PyArray2<f64>) {
-    self.next_ref_frame = next_ref_frame.readonly().as_array().into_owned();
+  fn set_next_ref_frame(&mut self, next_ref_frame: &PyBound<PyArray2<f64>>) {
+    self.next_ref_frame = next_ref_frame.readonly().as_array().to_owned();
   }
 
   #[setter(p_vector)]
@@ -591,7 +593,7 @@ impl GeneralModule {
   /// next_ref_frames: list of 2d np.arrays corresponding to the p_vectors. Each column vector in
   ///                  the array corresponds with x,y,z. The corresponding p_vector is aligned with
   ///                  the first column vector.
-  fn new_py(p_vectors: Vec<ProbPos>, next_ref_frames: Vec<&PyArray2<f64>>) -> Self {
+  fn new_py(p_vectors: Vec<ProbPos>, next_ref_frames: Vec<PyBound<PyArray2<f64>>>) -> Self {
     Self {
       centroid: Pos::Det(DetPos {
         pos: array![0.0, 0.0, 0.0],
@@ -618,11 +620,11 @@ impl GeneralModule {
     self.next_ref_frames[idx]
       .clone()
       .into_pyarray(py)
-      .to_owned()
+      .unbind()
   }
 
-  fn set_next_ref_frame(&mut self, next_ref_frame: &PyArray2<f64>, idx: usize) {
-    self.next_ref_frames[idx] = next_ref_frame.readonly().as_array().into_owned();
+  fn set_next_ref_frame(&mut self, next_ref_frame: &PyBound<PyArray2<f64>>, idx: usize) {
+    self.next_ref_frames[idx] = next_ref_frame.readonly().as_array().to_owned();
   }
 
   fn set_p_vector(&mut self, p_vector: ProbPos, idx: usize) {
@@ -656,7 +658,7 @@ impl GeneralModule {
 
   #[getter(ref_frame)]
   fn get_ref_frame(&self, py: Python) -> Py<PyArray2<f64>> {
-    self.ref_frame.clone().into_pyarray(py).to_owned()
+    self.ref_frame.clone().into_pyarray(py).unbind()
   }
 }
 
@@ -834,12 +836,12 @@ impl Construct {
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn dynamo(_py: Python, m: &PyModule) -> PyResult<()> {
+fn dynamo(_py: Python, m: &PyBound<'_, PyModule>) -> PyResult<()> {
   m.add_class::<ProbPos>()?;
-  m.add_class::<Construct>()?;
+  // m.add_class::<Construct>()?;
   m.add_class::<DetPos>()?;
   m.add_class::<Module>()?;
-  m.add_class::<GeneralModule>()?;
+  // m.add_class::<GeneralModule>()?;
   Ok(())
 }
 
