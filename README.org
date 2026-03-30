@@ -18,7 +18,6 @@ import dynamo
 from dynamo import rp
 #+end_src
 
-#+RESULTS[ed8d74e900f03f7f7b95ad216d523dc74dae6a08]:
 
 * Examples
 ** Abstract Dynamo Example
@@ -96,10 +95,12 @@ for i, mod in enumerate(assembled_mods):
 ax.set_aspect('equal')
 ax.set_xlabel("x")
 ax.set_ylabel("y")
+fig.savefig("example-figure.png", bbox_inches="tight")
 #+end_src
 
-#+RESULTS[6e77da880efdad6e5458959f38b0f24cdabc529b]:
-[[file:./.ob-jupyter/f46f89c6618dd5ae2c99ad31c3c2e02273ba101a.png]]
+#+CAPTION: Example figure
+#+NAME:   fig:example
+[[./example-figure.png]]
 
 ** Hull Generation
 
