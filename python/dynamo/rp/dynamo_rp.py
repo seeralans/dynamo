@@ -1,7 +1,7 @@
-import dynamo.dynamo as dym
+from dynamo._core import ProbPos, GeneralModule
 import numpy as np
-import dynamo_rp.rp_utility as rpt
-from dynamo_rp import parameters as pm
+from dynamo.rp import rp_utility as rpt
+from dynamo.rp import parameters as pm
 
 # TODO Only functions that deals with dym objects should be here.  
 
@@ -96,7 +96,7 @@ def get_prob_pos_from_kwargs(mu=None, cov=None, w=None):
         cov = np.zeros((1, 3, 3))
     if w is None:
         w = np.array([1.0])
-    return dym.ProbPos(np.array(mu), np.array(cov), np.array(w))
+    return ProbPos(np.array(mu), np.array(cov), np.array(w))
 
 
 def get_general_module_from_rp(rp, model_params):
@@ -122,7 +122,7 @@ def get_general_module_from_rp(rp, model_params):
         ref_frame = np.array(ref_frame)
         ref_frames.append(ref_frame)
 
-    module = dym.GeneralModule(p_vecs, ref_frames)
+    module = GeneralModule(p_vecs, ref_frames)
     module.tracked_points = ref_points
     return module
 

@@ -2,7 +2,7 @@ import json
 import Bio.PDB
 import numpy as np
 from string import Template
-from dynamo_rp import parameters as pm
+from dynamo.rp import parameters as pm
 
 CART_RELAX_STRING = """
 <ROSETTASCRIPTS>
@@ -34,7 +34,7 @@ def construct_cart_relax(chain, buff=3, out_file=None, cap=False):
     Returns:
         script (str): The xml script as a string.
     """
-    from dynamo_rp import parameters as pm
+    from dynamo.rp import parameters as pm
 
     residue_count = np.array([pm.module_lengths[mod] for mod in chain]).cumsum()
     span_strings = [SPAN_STRING.substitute(start=1, end=residue_count[-1], chi=0, bb=0)]

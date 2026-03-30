@@ -836,7 +836,7 @@ impl Construct {
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn dynamo(_py: Python, m: &PyBound<'_, PyModule>) -> PyResult<()> {
+fn _core(_py: Python, m: &PyBound<'_, PyModule>) -> PyResult<()> {
   m.add_class::<ProbPos>()?;
   m.add_class::<Construct>()?;
   m.add_class::<DetPos>()?;

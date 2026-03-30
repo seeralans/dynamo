@@ -1,6 +1,6 @@
 import numpy as np
-from dynamo_rp import parameters as pm
-from dynamo_rp import hull_generation as hg
+from dynamo.rp import parameters as pm
+from dynamo.rp import hull_generation as hg
 from sklearn.mixture import GaussianMixture
 
 

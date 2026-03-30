@@ -4,22 +4,21 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "dynamo_base"
+name = "_core"
 crate-type = ["cdylib", "lib"]
 
 [dependencies]
-ndarray = { version = "0.15.0", features = ["rayon"] }
+ndarray = { version = "0.17.2", features = ["rayon"] }
 openblas-src = "0.10.14"
 ndarray-linalg = {version = "0.18.1"}
-numpy = "0.27.0"
+numpy = "0.28.0"
 approx = "0.5.0"
 num = "0.4.1"
 cargo-watch = "8.4.0"
 indextree = "4.6.0"
 
-
 [dependencies.pyo3]
-version = "0.27.0"
+version = "0.28.0"
 features = ["extension-module"]
 
 [profile.dev]

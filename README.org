@@ -1,40 +1,41 @@
-#+title: dynamo_rp
+#+title: dynamo
 
-Introducing Dynamo_RP: A Python Library for Coarse-Grained Modeling of Repeat Proteins
+Dynamo: A Python Library for Coarse-Grained Modeling of Repeat Proteins
 
 
 * Installation
 After downloading the repo:
 #+begin_src shell
-cd dynamo_rp
-pip install .
+cd dynamo
+pip install maturin
+maturin develop --release
 #+end_src
 The dependencies for the project are listed in ~pyproject.toml~.
 
 * Usage
 #+begin_src python
 import dynamo
-import dynamo_rp
+from dynamo import rp
 #+end_src
 
-#+RESULTS:
+#+RESULTS[ed8d74e900f03f7f7b95ad216d523dc74dae6a08]:
 
 * Examples
 ** Abstract Dynamo Example
 #+begin_src python
 import numpy as np
 import matplotlib.pyplot as pp
-from dynamo import dynamo as pd
+from dynamo import ProbPos, GeneralModule, Construct
 pp.style.use(['default'])
 
 rot_xy = lambda th: np.array([[np.cos(th), -np.sin(th), 0], [np.sin(th), np.cos(th), 0], [0, 0, 1]])
-prob_pos = lambda mu, f_cov=np.zeros(3, float): pd.ProbPos(
+prob_pos = lambda mu, f_cov=np.zeros(3, float): ProbPos(
   np.array([mu]),
   np.array([np.diag(f_cov)]),
   np.array([1.0])
 ) 
 
-hub = pd.GeneralModule(
+hub = GeneralModule(
   [
     prob_pos(np.array([1.0, 0.0, 0.0]),  f_cov=np.array([0.5, 0.5, 0.0])),
     prob_pos(np.array([0.0, 1.0, 0.0]),  f_cov=np.array([0.5, 0.5, 0.0])),
@@ -49,7 +50,7 @@ hub = pd.GeneralModule(
   ],
 )
 
-mod = lambda dist, th: pd.GeneralModule(
+mod = lambda dist, th: GeneralModule(
   [
     prob_pos(np.array([-dist, 0.0, 0.0]), f_cov=np.array([0.1, 0.1, 0.0])),
     prob_pos(np.array([dist, 0.0, 0.0]) @ rot_xy(th).T, f_cov=np.array([0.1, 0.1, 0.0]))
@@ -78,7 +79,7 @@ for i in range(4):
   #general_mods[1 + chain_length * i].set_p_vector(p_vec, 0)
 
 
-construct = pd.Construct(general_mods, edges)
+construct = Construct(general_mods, edges)
 construct.propagate(3)
 assembled_mods = construct.get_assembled_modules()
 colours = [(0.0, 0.0, 0.0)]
@@ -93,18 +94,20 @@ for i, mod in enumerate(assembled_mods):
   sigma = (cov[0, 0] * cov[1, 1])**(1/2) + 0.1
   ax.scatter(mean[0], mean[1], s=sigma * 20, color=colours[i])
 ax.set_aspect('equal')
+ax.set_xlabel("x")
+ax.set_ylabel("y")
 #+end_src
 
-#+RESULTS:
-[[file:./.ob-jupyter/ee45352996a182a616e057007165218bc95851c9.png]]
+#+RESULTS[6e77da880efdad6e5458959f38b0f24cdabc529b]:
+[[file:./.ob-jupyter/f46f89c6618dd5ae2c99ad31c3c2e02273ba101a.png]]
 
 ** Hull Generation
 
 #+begin_src python
 import numpy as np
-from dynamo_rp import dynamo_rp as drp
-from dynamo_rp import parameters as pm
-from dynamo_rp import hull_generation as hg
+from dynamo.rp import dynamo_rp as drp
+from dynamo.rp import parameters as pm
+from dynamo.rp import hull_generation as hg
 
 hull_folder = "/home/ss14546/work/protein-crane/data/examples/rp_hull"
 pdb_folder = "/home/ss14546/work/protein-crane/data/rp_relax"
@@ -128,10 +131,10 @@ for rp in rps:
 ** Model Paramter Generation
 
 #+begin_src python
-from dynamo_rp import dynamo_rp as drp
-from dynamo_rp import parameters as pm
-from dynamo_rp import rp_utility as ut
-from dynamo_rp import params_gen as pmg
+from dynamo.rp import dynamo_rp as drp
+from dynamo.rp import parameters as pm
+from dynamo.rp import rp_utility as ut
+from dynamo.rp import params_gen as pmg
 import json
 import numpy as np
 import copy
@@ -200,11 +203,9 @@ np.savetxt("not_working.txt", n_working)
 
 ** Protein Builds 
 #+begin_src python
-from dynamo import dynamo as dym
+from dynamo import Construct, vis
 import numpy as np
-from dynamo_rp import dynamo_rp as drp
-from dynamo import vis 
-from mayavi import mlab
+from dynamo.rp import dynamo_rp as drp
 
 model_params = drp.get_model_params("/home/ss14546/work/protein-crane/data/model_params_clean")
 hub_params = drp.get_model_params("/home/ss14546/work/protein-crane/data/model_params_hub_static")
@@ -212,26 +213,24 @@ chain = ["D49" for _ in range(9)]
 general_mods = drp.get_general_modules_from_chain(chain, model_params)
 edges = [((i, 0), (i+1, 1)) for i in range(len(chain)-1)]
 
-construct = dym.Construct(general_mods, edges)
+construct = Construct(general_mods, edges)
 construct.propagate(1)
 
 
-fig3d = mlab.figure(figure='main', size=(100, 100))
+plotter = vis.create_plotter()
 construct.propagate(0)
 assembled_mods = construct.get_assembled_modules()
-vis.visualise_centroids_of_modules(assembled_mods, fig3d, interp_points=100, fin_dims=[0, 1, 2])
-mlab.show()
+vis.visualise_centroids_of_modules(assembled_mods, plotter, interp_points=100, fin_dims=[0, 1, 2])
+vis.show(plotter)
 #+end_src
 
 #+RESULTS:
 
 *** Star Build
 #+begin_src python
-from dynamo import dynamo as dym
+from dynamo import Construct, vis
 import numpy as np
-from dynamo_rp import dynamo_rp as drp
-from dynamo import vis 
-from mayavi import mlab
+from dynamo.rp import dynamo_rp as drp
 import json
 
 model_params = drp.get_model_params("/home/ss14546/work/protein-crane/data/model_params_D4")
@@ -264,23 +263,23 @@ for i in range(4):
                + chain_edges(1+chain_length*i, chain_length))
 
 
-fig3d = mlab.figure(figure='main', size=(100, 100))
-construct = dym.Construct(general_mods, edges)
+plotter = vis.create_plotter()
+construct = Construct(general_mods, edges)
 construct.propagate(0)
 
 assembled_mods = construct.get_assembled_modules()
 for i in range(4):
  chain_mods = [assembled_mods[0]]
  chain_mods += assembled_mods[chain_length * i + 1: chain_length*(i+1)+1]
- vis.visualise_centroids_of_modules(chain_mods, fig3d, interp_points=100)
-mlab.show()
+ vis.visualise_centroids_of_modules(chain_mods, plotter, interp_points=100)
+vis.show(plotter)
 #+end_src
 
 #+RESULTS:
 
 ** PDB Generation
 #+begin_src python
-from dynamo_rp import pdb_generation as pg 
+from dynamo.rp import pdb_generation as pg 
 #+end_src
 
 #+begin_src python
@@ -294,5 +293,3 @@ for i in range(6+1):
   pg.construct_large_protein(get_chain_l(i), out_file_l(i), pdb_folder)
   pg.construct_large_protein(get_chain_r(i), out_file_r(i), pdb_folder)
 #+end_src
-
-
