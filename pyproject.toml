@@ -1,20 +1,26 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
 
 [project]
-name = "dynamo_rp"
-version = "0.0.1"
-requires-python = ">=3.7"
-# classifiers = [
-#     "Programming Language :: Rust",
-#     "Programming Language :: Python :: Implementation :: CPython",
-#     "Programming Language :: Python :: Implementation :: PyPy",
-# ]
-
-dependencies = [
-"numpy",
-"matplotlib",
-"scipy",
-"mayavi"
+name = "dynamo"
+version = "0.1.0"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
 ]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "scipy",
+    "pyvista",
+    "scikit-learn",
+    "pandas",
+    "biopython",
+]
+
+[tool.maturin]
+python-source = "python"
+module-name = "dynamo._core"
+features = ["pyo3/extension-module"]
