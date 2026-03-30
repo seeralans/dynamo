@@ -838,10 +838,10 @@ impl Construct {
 #[pymodule]
 fn dynamo(_py: Python, m: &PyBound<'_, PyModule>) -> PyResult<()> {
   m.add_class::<ProbPos>()?;
-  // m.add_class::<Construct>()?;
+  m.add_class::<Construct>()?;
   m.add_class::<DetPos>()?;
   m.add_class::<Module>()?;
-  // m.add_class::<GeneralModule>()?;
+  m.add_class::<GeneralModule>()?;
   Ok(())
 }
 
